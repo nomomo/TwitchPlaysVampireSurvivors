@@ -7,7 +7,7 @@
 (본 모드는 뱀파이어 서바이버 v0.2.13c 버전에서 정상 동작하도록 개발되었습니다.)
 
 모드를 설치하면 레벨 업 시 아래 그림과 같이 투표가 진행되며<br />
-시청자들은 채팅을 통해 아이템을 선택할 수 있습니다!
+시청자들은 채팅을 통해 아이템을 선택할 수 있습니다.
 
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/1_poll.png)
 
@@ -19,10 +19,11 @@
 
 메인 페이지에서 몇 가지 옵션을 선택할 수 있습니다.
 
-- 스트리머 아이템 선택 불가 옵션에 체크하면 트수런 모드가 됩니다.
+- 스트리머 아이템 선택 불가 옵션에 체크하면 트수런 모드가 됩니다.<br />뱀서의 권위자에게 트수런은 트수의 훈수따윈 무용하다는 것을 증명할 절호의 찬스입니다.<br />가차없이 썰어버리고 당신의 컨트롤을 증명하세요.
 ![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/0_main_menu_option.png)
-- 스트리머 아이템 선택 불가 옵션을 체크 해제하면 훈수 모드가 됩니다.
+- 스트리머 아이템 선택 불가 옵션을 체크 해제하면 훈수 모드가 됩니다.<br />무면허 뱀린이에게 유용할지도...?
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/4_hunsu.png)
+- 토토와 함께하면 더욱 재밌어요
 
 ## 모드 설치 방법
 
@@ -46,6 +47,7 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer
     - 모드가 제대로 작동하지 않는 경우에도 위 이메일로 제보해주세요!
 
 5. 뱀파이버 서바이버가 버전업 되는 경우, 모드 파일 중 index.html 파일만 다시 덮어씌우면 됩니다.
+그런데 버전업 시 모드 수정 없이 기존 모드가 정상 동작할 가능성은 그다지 높지 않습니다. 자세한 설명은 생략...😥
 
 ## 모드 제거 방법
 
