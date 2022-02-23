@@ -19,9 +19,9 @@
 
 메인 페이지에서 몇 가지 옵션을 선택할 수 있습니다.
 
-- 스트리머 아이템 선택 불가 옵션에 체크하면 트수런 모드가 됩니다.<br />뱀서의 권위자에게 트수런은 트수의 훈수따윈 무용하다는 것을 증명할 절호의 찬스입니다.<br />가차없이 썰어버리고 당신의 컨트롤을 증명하세요.
+- 스트리머 아이템 선택 불가 옵션에 체크하면 트수런 모드가 됩니다.<br />뱀서의 권위자에게 트수런은 트수의 훈수따윈 무용하다는 것을 증명할 절호의 찬스입니다.<br />가차없이 썰어버리고 당신의 컨트롤을 증명하세요.<br />
 ![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/0_main_menu_option.png)
-- 스트리머 아이템 선택 불가 옵션을 체크 해제하면 훈수 모드가 됩니다.<br />무면허 뱀린이에게 유용할지도...?
+- 스트리머 아이템 선택 불가 옵션을 체크 해제하면 훈수 모드가 됩니다.<br />무면허 뱀린이에게 유용할지도...?.<br />
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/4_hunsu.png)
 - 토토와 함께하면 더욱 재밌어요
 
