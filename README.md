@@ -15,7 +15,7 @@
 - 투표 종료 후 아이템은 자동으로 선택되어 게임에 반영됩니다.
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/2_tsr.png)
 
-## Options 
+## 선택 가능한 옵션 
 
 메인 페이지에서 몇 가지 옵션을 선택할 수 있습니다.
 
@@ -24,7 +24,7 @@
 - 스트리머 아이템 선택 불가 옵션을 체크 해제하면 훈수 모드가 됩니다.
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/4_hunsu.png)
 
-## Install
+## 모드 설치 방법
 
 1. 아래 링크로 접속해 모드 파일을 다운로드 받습니다.
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
