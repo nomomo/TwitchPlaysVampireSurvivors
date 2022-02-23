@@ -222,11 +222,16 @@ var tpvsLang = {
 }
 
 function getTpvsLang(key){
-    if(settings.language == "ko"){
-        return tpvsLang.ko[key];
+    try{
+        if(settings.language == "ko"){
+            return tpvsLang.ko[key];
+        }
+        else {
+            return tpvsLang.en[key];
+        }
     }
-    else {
-        return tpvsLang.en[key];
+    catch(e){
+        NOMO_DEBUG("error from getTpvsLang", e);
     }
 }
 
@@ -265,52 +270,56 @@ const injectionFromTo = [
 var isWellInjected = true;
 var canbeinjectedandindexmap = [];
 function injectScript(script_ori){
-    var script = script_ori;
+    try{
+        var script = script_ori;
 
-    // check if script snippets can be injected to original script
-    for(var i=0;i<injectionFromTo.length;i++){
-        var scriptSnippetsGroup = injectionFromTo[i];
-        var canbeinjected = false;
-        var injectionIndex = -1;
-        for(var j=0;j<scriptSnippetsGroup.length;j++){
-            var scriptSnippet = scriptSnippetsGroup[j];
-            var from = scriptSnippet[0];
-            var to = scriptSnippet[1];
-            NOMO_DEBUG("fromto", from, to);
-            if(script_ori.indexOf(from) !== -1){
-                canbeinjected = true;
-                injectionIndex = j;
-                break;
+        // check if script snippets can be injected to original script
+        for(var i=0;i<injectionFromTo.length;i++){
+            var scriptSnippetsGroup = injectionFromTo[i];
+            var canbeinjected = false;
+            var injectionIndex = -1;
+            for(var j=0;j<scriptSnippetsGroup.length;j++){
+                var scriptSnippet = scriptSnippetsGroup[j];
+                var from = scriptSnippet[0];
+                var to = scriptSnippet[1];
+                NOMO_DEBUG("fromto", from, to);
+                if(script_ori.indexOf(from) !== -1){
+                    canbeinjected = true;
+                    injectionIndex = j;
+                    break;
+                }
+            }
+            if(!canbeinjected){
+                isWellInjected = false;
+            }
+            canbeinjectedandindexmap.push([canbeinjected, injectionIndex]);
+        }
+
+        // can not be injected
+        if(!isWellInjected){
+            NOMO_DEBUG("CAN NOT BE INJECTED", canbeinjectedandindexmap);
+        }
+        // can be injected
+        else{
+            NOMO_DEBUG("CAN BE INJECTED", canbeinjectedandindexmap);
+            for(var i=0;i<injectionFromTo.length;i++){
+                var arrayTemp = injectionFromTo[i][canbeinjectedandindexmap[i][1]];
+                var from = arrayTemp[0];
+                var to = arrayTemp[1];
+                script = script.replace(from,to);
             }
         }
-        if(!canbeinjected){
-            isWellInjected = false;
-        }
-        canbeinjectedandindexmap.push([canbeinjected, injectionIndex]);
-    }
 
-    // can not be injected
-    if(!isWellInjected){
-        NOMO_DEBUG("CAN NOT BE INJECTED", canbeinjectedandindexmap);
-    }
-    // can be injected
-    else{
-        NOMO_DEBUG("CAN BE INJECTED", canbeinjectedandindexmap);
-        for(var i=0;i<injectionFromTo.length;i++){
-            var arrayTemp = injectionFromTo[i][canbeinjectedandindexmap[i][1]];
-            var from = arrayTemp[0];
-            var to = arrayTemp[1];
-            script = script.replace(from,to);
-        }
-    }
+        twitchPlayInit();
 
-    twitchPlayInit();
-
-    return script;
+        return script;
+    }
+    catch(e){
+        NOMO_DEBUG("error from injectScript", e);
+    }
 }
 
 var rawFileMain = new XMLHttpRequest();
-var rawFileMainText = "";
 rawFileMain.open("GET", "main.bundle.js", true);
 rawFileMain.onload  = function() {
     var rawFileMainText = rawFileMain.responseText;
@@ -321,7 +330,7 @@ rawFileMain.onload  = function() {
     //     .replace("]('options_header')","]('options_header'),tpvs_startPage()")
     //     .replace("['BackFromCharSelectionScene'](){","['BackFromCharSelectionScene'](){tpvs_startPage();")
     //     .replace("]('levelup_header')","]('levelup_header'),window.tpvs=this,tpvs_startPoll()");
-    //     //.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':10000000000.03,")
+    //rawFileMainText = rawFileMainText.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':10000000000.03,")
     rawFileMainText = injectScript(rawFileMainText);
     eval(rawFileMainText);
 };
@@ -496,44 +505,54 @@ var twitchChatConnected = false;
 // Define configuration options
 var client;
 function TwitchChatConnect(){
-    client = null; // GC
-    const opts = {
-        connection: {
-            secure: true,
-            reconnect: true
-        },
-        identity: {
-            username: "justinfan821125",
-            password: ""
-        },
-        channels: [settings.twitch_user_id.toLowerCase()]
-    };
-    client = new tmi.client(opts);
-    client.on('message', onMessageHandler);
-    client.on('connected', onConnectedHandler);
-    client.on('disconnected', onDisconnectedHandler);
-    client.connect();
+    try{
+        client = null; // GC
+        const opts = {
+            connection: {
+                secure: true,
+                reconnect: true
+            },
+            identity: {
+                username: "justinfan821125",
+                password: ""
+            },
+            channels: [settings.twitch_user_id.toLowerCase()]
+        };
+        client = new tmi.client(opts);
+        client.on('message', onMessageHandler);
+        client.on('connected', onConnectedHandler);
+        client.on('disconnected', onDisconnectedHandler);
+        client.connect();
+    }
+    catch(e){
+        NOMO_DEBUG("error from TwitchChatConnect", e);
+    }
 }
 
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
-    if (self) { return; } // Ignore messages from the bot
-    if (settings.subonly && !context.subscriber){ return; } // subonly poll option
-    if (ispollstart){
-        var id = context["user-id"];
-        var msg = msg.trim().toLowerCase();
-        
-        msg = msg
-            .replace("!","")
-            .replace("투표","")
-            .replace("/\s/g","")
-            .trim();
-        if(msg.length > 0){
-            msg = msg[0];
+    try{
+        if (self) { return; } // Ignore messages from the bot
+        if (settings.subonly && !context.subscriber){ return; } // subonly poll option
+        if (ispollstart){
+            var id = context["user-id"];
+            var msg = msg.trim().toLowerCase();
+            
+            msg = msg
+                .replace("!","")
+                .replace("투표","")
+                .replace("/\s/g","")
+                .trim();
+            if(msg.length > 0){
+                msg = msg[0];
+            }
+            if($.isNumeric(msg)){
+                countpoll(id,Number(msg));
+            }
         }
-        if($.isNumeric(msg)){
-            countpoll(id,Number(msg));
-        }
+    }
+    catch(e){
+        NOMO_DEBUG("error from onMessageHandler", e);
     }
 }
 
@@ -582,21 +601,26 @@ var polltext_lang = [];
 
 
 function countpoll(id, result){
-    //NOMO_DEBUG("countpoll", id, result);
-    if(result > polln_total || result < 1){
-        return;
-    }
+    try{
+        //NOMO_DEBUG("countpoll", id, result);
+        if(result > polln_total || result < 1){
+            return;
+        }
 
-    // 이미 투표한 경우
-    if(polldata[id] !== undefined){
-        pollcount[polldata[id]] = pollcount[polldata[id]] - 1;
-    }
-    else{
-        pollcount_total = pollcount_total + 1;
-    }
+        // 이미 투표한 경우
+        if(polldata[id] !== undefined){
+            pollcount[polldata[id]] = pollcount[polldata[id]] - 1;
+        }
+        else{
+            pollcount_total = pollcount_total + 1;
+        }
 
-    pollcount[result] = pollcount[result] + 1;
-    polldata[id] = result;
+        pollcount[result] = pollcount[result] + 1;
+        polldata[id] = result;
+    }
+    catch(e){
+        NOMO_DEBUG("error from countpoll", e);
+    }
 }
 
 function resetpollcount(){
@@ -644,156 +668,161 @@ function setTpvsDesc(html){
 
 ////////////////////////////////////////////////////////////////////
 function tpvs_startPoll(restart){
-    NOMO_DEBUG("tpvs_startPoll");
-    $("#pollContainer").removeClass("main");
-    poll_time = settings.poll_time;
-    resetpollcount();
-    resetLayout();
-    $("#twitchChatStatus").hide();
-    setTpvsDesc(getTpvsLang("letsPoll"));
-    toggleUserInput(!settings.prevent_streamer_select);
-
-    setTimeout(function(){
-        ispollstart = true;
-        // get weapon name
-        var panels = tpvs['panels'];
-
-        // var functionList = ["OnItemButtonClicked", "OnButtonClicked", "OnReroll", "OnSkip"];
-        // for(var i=0;i<functionList.length; i++){
-        //     var funcName = functionList[i];
-        //     var newFuncName = funcName+'Ori';
-        //     if(tpvs[newFuncName] === undefined && tpvs[funcName] !== undefined){
-        //         NOMO_DEBUG(`OVERRIDE FUNCTION FROM ${funcName} to ${newFuncName}`);
-        //         tpvs[newFuncName] = tpvs[funcName];
-        //         tpvs[funcName] = function(){
-        //             NOMO_DEBUG("OVERRIDED FUNCTION: "+funcName);
-        //             forcefinishpoll();
-        //             this[newFuncName](arguments);
-        //         }
-        //     }
-        // }
-        if(tpvs["OnItemButtonClickedOri"] === undefined && tpvs["OnItemButtonClicked"] !== undefined){
-            NOMO_DEBUG("OVERRIDE FUNCTION: OnItemButtonClicked");
-            tpvs["OnItemButtonClickedOri"] = tpvs["OnItemButtonClicked"];
-            tpvs["OnItemButtonClicked"] = function(weapon){
-                NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnItemButtonClicked");
-                forcefinishpoll();
-                showLastSelectedWeapon(weapon);
-                this["OnItemButtonClickedOri"](weapon);
-            };
-        }
-
-        if(tpvs["OnButtonClickedOri"] === undefined && tpvs["OnButtonClicked"] !== undefined){
-            NOMO_DEBUG("OVERRIDE FUNCTION: OnButtonClicked");
-            tpvs["OnButtonClickedOri"] = tpvs["OnButtonClicked"];
-            tpvs["OnButtonClicked"] = function(item){
-                NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnButtonClicked");
-                forcefinishpoll();
-                showLastSelectedWeapon(item);
-                this["OnButtonClickedOri"](item);
-            };
-        }
-
-        if(tpvs["OnRerollOri"] === undefined && tpvs["OnReroll"] !== undefined){
-            NOMO_DEBUG("OVERRIDE FUNCTION: OnReroll");
-            tpvs["OnRerollOri"] = tpvs["OnReroll"];
-            tpvs["OnReroll"] = function(){
-                NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnReroll");
-                forcefinishpoll();
-                showLastSelectedWeapon("REROLL");
-                this["OnRerollOri"]();
-            };
-        }
-
-        if(tpvs["OnSkipOri"] === undefined && tpvs["OnSkip"] !== undefined){
-            NOMO_DEBUG("OVERRIDE FUNCTION: OnSkip");
-            tpvs["OnSkipOri"] = tpvs["OnSkip"];
-            tpvs["OnSkip"] = function(){
-                NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnSkip");
-                forcefinishpoll();
-                showLastSelectedWeapon("SKIP");
-                this["OnSkipOri"]();
-            };
-        }
-
-        $("#polllist_ul").append(`<tr><td class="totalcount">${getTpvsLang("totalcount")} : <span class="totalcount_cnt"></span></td></tr>`);
-        for(var i=0; i<panels.length; i++){
-            var wptype = panels[i].weaponType;
-            if(wptype !== undefined){
-                polln_total = polln_total + 1;
-
-                pollindex_seq[polln_total] = wptype;
-
-                polltext[i] = wptype;
-                polltext_lang[i] = getWeaponName(wptype);
-                NOMO_DEBUG(`${i}th WEAPON: ${polltext_lang[i]}`);
-                
-                // create layout
-                $("#polllist_ul").append(`<tr class="${wptype}"><td class="wp">${polln_total}. ${polltext_lang[i]}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">???</div></td></tr>`);
-            }
-        }
-        
-        var IS_ITEMS = true;
-        for(var i=0; i<polln_total; ++i){
-            if(!itemList.includes(polltext[i])){
-                NOMO_DEBUG(polltext[i], polltext_lang[i]);
-                IS_ITEMS = false;
-            }
-        }
-
-        // 모든 것이 아이템일 경우 스킵함
-        if(IS_ITEMS && settings.skip_poll_for_goldcoins_and_chicken){
-            NOMO_DEBUG("투표하지 않음, 총 아이템 개수: " , polln_total);
-            forcefinishpoll();
-            return;
-        }
-        NOMO_DEBUG("polltext",polltext,"IS_ITEMS",IS_ITEMS,"skip_poll_for_goldcoins_and_chicken",settings.skip_poll_for_goldcoins_and_chicken)
-
-        if(polln_total == 0){
-            // if(settings.skip_poll_for_goldcoins_and_chicken){
-            //     NOMO_DEBUG("투표하지 않음, 총 아이템 개수: " , polln_total);
-            //     return;
-            // }
-            // else {
-            //     for(var i=0; i<panels.length; i++){
-            //         var wptype = panels[i].itemType;
-            //         if(wptype !== undefined){
-            //             polln_total = polln_total + 1;
-        
-            //             pollindex_seq[polln_total] = wptype;
-        
-            //             polltext[i] = wptype;
-            //             polltext_lang[i] = getWeaponName(wptype);
-            //             NOMO_DEBUG(`${i}th ITEM: ${polltext_lang[i]}`);
-                        
-            //             // create layout
-            //             $("#polllist_ul").append(`<tr class="${wptype}"><td class="wp">${polln_total}. ${polltext_lang[i]}</td><td class="cnt cnt_${polln_total}">0</td></tr>`);
+    try{
+        NOMO_DEBUG("tpvs_startPoll");
+        $("#pollContainer").removeClass("main");
+        poll_time = settings.poll_time;
+        resetpollcount();
+        resetLayout();
+        $("#twitchChatStatus").hide();
+        setTpvsDesc(getTpvsLang("letsPoll"));
+        toggleUserInput(!settings.prevent_streamer_select);
+    
+        setTimeout(function(){
+            ispollstart = true;
+            // get weapon name
+            var panels = tpvs['panels'];
+    
+            // var functionList = ["OnItemButtonClicked", "OnButtonClicked", "OnReroll", "OnSkip"];
+            // for(var i=0;i<functionList.length; i++){
+            //     var funcName = functionList[i];
+            //     var newFuncName = funcName+'Ori';
+            //     if(tpvs[newFuncName] === undefined && tpvs[funcName] !== undefined){
+            //         NOMO_DEBUG(`OVERRIDE FUNCTION FROM ${funcName} to ${newFuncName}`);
+            //         tpvs[newFuncName] = tpvs[funcName];
+            //         tpvs[funcName] = function(){
+            //             NOMO_DEBUG("OVERRIDED FUNCTION: "+funcName);
+            //             forcefinishpoll();
+            //             this[newFuncName](arguments);
             //         }
             //     }
             // }
-        }
-
-        updateTimer(checkPollEnd);
-
-        if(tpvs.HasRerolls){
-            polln_total = polln_total + 1;
-            pollindex_seq[polln_total] = "REROLL";
-            $("#polllist_ul").append(`<tr class="REROLL"><td class="wp">${polln_total}. ${getWeaponName("REROLL")}</td><td class="cnt cnt_${polln_total}">0</span></tr>`);
-        }
-        if(tpvs.HasSkips){
-            polln_total = polln_total + 1;
-            pollindex_seq[polln_total] = "SKIP";
-            $("#polllist_ul").append(`<tr class="SKIP"><td class="wp">${polln_total}. ${getWeaponName("SKIP")}</td><td class="cnt cnt_${polln_total}">0</td></tr>`);
-        }
-
-        // count set
-        for(var i=1; i<=polln_total; ++i){
-            pollcount[i] = 0;
-        }
-
-        togglePollLayout(true);
-        showLayout();
-    },100);
+            if(tpvs["OnItemButtonClickedOri"] === undefined && tpvs["OnItemButtonClicked"] !== undefined){
+                NOMO_DEBUG("OVERRIDE FUNCTION: OnItemButtonClicked");
+                tpvs["OnItemButtonClickedOri"] = tpvs["OnItemButtonClicked"];
+                tpvs["OnItemButtonClicked"] = function(weapon){
+                    NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnItemButtonClicked");
+                    forcefinishpoll();
+                    showLastSelectedWeapon(weapon);
+                    this["OnItemButtonClickedOri"](weapon);
+                };
+            }
+    
+            if(tpvs["OnButtonClickedOri"] === undefined && tpvs["OnButtonClicked"] !== undefined){
+                NOMO_DEBUG("OVERRIDE FUNCTION: OnButtonClicked");
+                tpvs["OnButtonClickedOri"] = tpvs["OnButtonClicked"];
+                tpvs["OnButtonClicked"] = function(item){
+                    NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnButtonClicked");
+                    forcefinishpoll();
+                    showLastSelectedWeapon(item);
+                    this["OnButtonClickedOri"](item);
+                };
+            }
+    
+            if(tpvs["OnRerollOri"] === undefined && tpvs["OnReroll"] !== undefined){
+                NOMO_DEBUG("OVERRIDE FUNCTION: OnReroll");
+                tpvs["OnRerollOri"] = tpvs["OnReroll"];
+                tpvs["OnReroll"] = function(){
+                    NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnReroll");
+                    forcefinishpoll();
+                    showLastSelectedWeapon("REROLL");
+                    this["OnRerollOri"]();
+                };
+            }
+    
+            if(tpvs["OnSkipOri"] === undefined && tpvs["OnSkip"] !== undefined){
+                NOMO_DEBUG("OVERRIDE FUNCTION: OnSkip");
+                tpvs["OnSkipOri"] = tpvs["OnSkip"];
+                tpvs["OnSkip"] = function(){
+                    NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnSkip");
+                    forcefinishpoll();
+                    showLastSelectedWeapon("SKIP");
+                    this["OnSkipOri"]();
+                };
+            }
+    
+            $("#polllist_ul").append(`<tr><td class="totalcount">${getTpvsLang("totalcount")} : <span class="totalcount_cnt"></span></td></tr>`);
+            for(var i=0; i<panels.length; i++){
+                var wptype = panels[i].weaponType;
+                if(wptype !== undefined){
+                    polln_total = polln_total + 1;
+    
+                    pollindex_seq[polln_total] = wptype;
+    
+                    polltext[i] = wptype;
+                    polltext_lang[i] = getWeaponName(wptype);
+                    NOMO_DEBUG(`${i}th WEAPON: ${polltext_lang[i]}`);
+                    
+                    // create layout
+                    $("#polllist_ul").append(`<tr class="${wptype}"><td class="wp">${polln_total}. ${polltext_lang[i]}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">???</div></td></tr>`);
+                }
+            }
+            
+            var IS_ITEMS = true;
+            for(var i=0; i<polln_total; ++i){
+                if(!itemList.includes(polltext[i])){
+                    NOMO_DEBUG(polltext[i], polltext_lang[i]);
+                    IS_ITEMS = false;
+                }
+            }
+    
+            // 모든 것이 아이템일 경우 스킵함
+            if(IS_ITEMS && settings.skip_poll_for_goldcoins_and_chicken){
+                NOMO_DEBUG("투표하지 않음, 총 아이템 개수: " , polln_total);
+                forcefinishpoll();
+                return;
+            }
+            NOMO_DEBUG("polltext",polltext,"IS_ITEMS",IS_ITEMS,"skip_poll_for_goldcoins_and_chicken",settings.skip_poll_for_goldcoins_and_chicken)
+    
+            if(polln_total == 0){
+                // if(settings.skip_poll_for_goldcoins_and_chicken){
+                //     NOMO_DEBUG("투표하지 않음, 총 아이템 개수: " , polln_total);
+                //     return;
+                // }
+                // else {
+                //     for(var i=0; i<panels.length; i++){
+                //         var wptype = panels[i].itemType;
+                //         if(wptype !== undefined){
+                //             polln_total = polln_total + 1;
+            
+                //             pollindex_seq[polln_total] = wptype;
+            
+                //             polltext[i] = wptype;
+                //             polltext_lang[i] = getWeaponName(wptype);
+                //             NOMO_DEBUG(`${i}th ITEM: ${polltext_lang[i]}`);
+                            
+                //             // create layout
+                //             $("#polllist_ul").append(`<tr class="${wptype}"><td class="wp">${polln_total}. ${polltext_lang[i]}</td><td class="cnt cnt_${polln_total}">0</td></tr>`);
+                //         }
+                //     }
+                // }
+            }
+    
+            updateTimer(checkPollEnd);
+    
+            if(tpvs.HasRerolls){
+                polln_total = polln_total + 1;
+                pollindex_seq[polln_total] = "REROLL";
+                $("#polllist_ul").append(`<tr class="REROLL"><td class="wp">${polln_total}. ${getWeaponName("REROLL")}</td><td class="cnt cnt_${polln_total}">0</span></tr>`);
+            }
+            if(tpvs.HasSkips){
+                polln_total = polln_total + 1;
+                pollindex_seq[polln_total] = "SKIP";
+                $("#polllist_ul").append(`<tr class="SKIP"><td class="wp">${polln_total}. ${getWeaponName("SKIP")}</td><td class="cnt cnt_${polln_total}">0</td></tr>`);
+            }
+    
+            // count set
+            for(var i=1; i<=polln_total; ++i){
+                pollcount[i] = 0;
+            }
+    
+            togglePollLayout(true);
+            showLayout();
+        },100);
+    }
+    catch(e){
+        NOMO_DEBUG("error from tpvs_startPoll", e);
+    }
 }
 
 function checkPollEnd(){
@@ -873,6 +902,7 @@ function checkPollEnd(){
     }
     catch(e){
         NOMO_DEBUG("Error from checkPollEnd()", e);
+        forcefinishpoll();
     }
 }
 
@@ -915,60 +945,86 @@ function finishPollWithPostTime(){
 ////////////////////////
 // 강제로 투표 끝내기
 function forcefinishpoll(){
-    hideLayout();
-    resetpollcount();
-    resetLayout();
-    setTpvsDesc("");
-    toggleUserInput(true);
-    togglePollLayout(false);
-    stopTimer();
-    ispollstart = false;
-    $("#twitchChatStatus").hide();
-    $("#welcomesign").hide();
-    $("#scriptstatus").hide();
-    $("#pollContainer").removeClass("main");
+    try{
+        hideLayout();
+        resetpollcount();
+        resetLayout();
+        setTpvsDesc("");
+        toggleUserInput(true);
+        togglePollLayout(false);
+        stopTimer();
+        ispollstart = false;
+        $("#twitchChatStatus").hide();
+        $("#welcomesign").hide();
+        $("#scriptstatus").hide();
+        $("#pollContainer").removeClass("main");
+    }
+    catch(e){
+        NOMO_DEBUG("error from forcefinishpoll", e);
+    }
 }
 
 /////////////////////////
 // 중복일 시 투표 재시작
 function restartpoll(){
-    updateCount(true);
-    setTpvsDesc(getTpvsLang("tiePoll"));
-    poll_time_startdate = new Date();
-    poll_time = settings.poll_restart_time;
-    updateTimer(checkPollEnd);
+    try{
+        updateCount(true);
+        setTpvsDesc(getTpvsLang("tiePoll"));
+        poll_time_startdate = new Date();
+        poll_time = settings.poll_restart_time;
+        updateTimer(checkPollEnd);
+    }
+    catch(e){
+        NOMO_DEBUG("error from restartpoll", e);
+    }
 }
 
 /////////////////////////
 // 시작 페이지 도달
 function tpvs_startPage(){
-    $("#pollContainer").addClass("main");
-    showLayout();
-    resetLayout();
-    updateTwitchChatStatus();
-    $("#welcomesign").fadeIn(500);
-    hideWelcomeSign(3000);
-    $("#twitchChatStatus").show();
-    showCurrentMode();
+    try{
+        $("#pollContainer").addClass("main");
+        showLayout();
+        resetLayout();
+        updateTwitchChatStatus();
+        $("#welcomesign").fadeIn(500);
+        hideWelcomeSign(3000);
+        $("#twitchChatStatus").show();
+        showCurrentMode();
+    }
+    catch(e){
+        NOMO_DEBUG("error from tpvs_startPage", e);
+    }
 }
 
 // 게임 시작 시
 function tpvs_startGame(){
-    NOMO_DEBUG("START GAME");
-    $("#pollContainer").removeClass("main");
-    forcefinishpoll();
+    try{
+        NOMO_DEBUG("START GAME");
+        $("#pollContainer").removeClass("main");
+        forcefinishpoll();
+    }
+    catch(e){
+        NOMO_DEBUG("error from tpvs_startGame", e);
+    }
 }
 
 // Post game page
 var ddikkubemote = ["(*≧▽≦)", "✧٩(ˊωˋ*)و✧", "҉ ٩(๑>ω<๑)۶҉", "(✌’ω’)✌", "(´･∀･`)", "（⌒▽⌒ゞ", "🤭", "🙃", " ⎛⎝⎛♥‿♥⎞⎠⎞ ", "(=^･ω･^=)", " ʅ（´◔౪◔）ʃ "];
 function tpvs_postGame(){
-    NOMO_DEBUG("POST GAME");
-    resetpollcount();
-    resetLayout();
-    var randomEmoji = ddikkubemote[Math.floor(Math.random() * ddikkubemote.length)];
-    setTpvsDesc(getTpvsLang("gameOver") + " " + randomEmoji);
-    $("#twitchChatStatus").hide();
-    showLayout();
+    try{
+        NOMO_DEBUG("POST GAME");
+        resetpollcount();
+        resetLayout();
+        var randomEmoji = ddikkubemote[Math.floor(Math.random() * ddikkubemote.length)];
+        setTpvsDesc(getTpvsLang("gameOver") + " " + randomEmoji);
+        $("#twitchChatStatus").hide();
+        showLayout();
+    }
+    catch(e){
+        NOMO_DEBUG("error from tpvs_postGame", e);
+        forcefinishpoll();
+    }
 }
 
 function updateTwitchChatStatus(){
@@ -981,65 +1037,80 @@ function updateTwitchChatStatus(){
 }
 
 function showCurrentMode(){
-    var text = `
-    <div style="padding-top:1vw;">
-        ${settings.prevent_streamer_select ? getTpvsLang("currentmode_strict") : getTpvsLang("currentmode_soft")}
+    try{
+        var text = `
         <div style="padding-top:1vw;">
-            <label id="checkbox_prevent_streamer_select">${getTpvsLang("isStrict")} <input type="checkbox" id="checkbox_prevent_streamer_select" /></label>
-            <label id="checkbox_auto_result_select_container">${getTpvsLang("isAutoselect")} <input type="checkbox" id="checkbox_auto_result_select" /></label>
-            <label id="checkbox_poll_result_hide_container">${getTpvsLang("hidePollDuringPoll")} <input type="checkbox" id="checkbox_poll_result_hide" /></label>
-            <label id="checkbox_skip_poll_for_goldcoins_and_chicken_container">${getTpvsLang("isSkipGoldcoinAndChicken")} <input type="checkbox" id="checkbox_skip_poll_for_goldcoins_and_chicken" /></label>
-            <label id="checkbox_subonly_container">${getTpvsLang("subonlypoll")} <input type="checkbox" id="checkbox_subonly" /></label>
+            ${settings.prevent_streamer_select ? getTpvsLang("currentmode_strict") : getTpvsLang("currentmode_soft")}
+            <div style="padding-top:1vw;">
+                <label id="checkbox_prevent_streamer_select">${getTpvsLang("isStrict")} <input type="checkbox" id="checkbox_prevent_streamer_select" /></label>
+                <label id="checkbox_auto_result_select_container">${getTpvsLang("isAutoselect")} <input type="checkbox" id="checkbox_auto_result_select" /></label>
+                <label id="checkbox_poll_result_hide_container">${getTpvsLang("hidePollDuringPoll")} <input type="checkbox" id="checkbox_poll_result_hide" /></label>
+                <label id="checkbox_skip_poll_for_goldcoins_and_chicken_container">${getTpvsLang("isSkipGoldcoinAndChicken")} <input type="checkbox" id="checkbox_skip_poll_for_goldcoins_and_chicken" /></label>
+                <label id="checkbox_subonly_container">${getTpvsLang("subonlypoll")} <input type="checkbox" id="checkbox_subonly" /></label>
+            </div>
         </div>
-    </div>
-    `;
-    var $startGUI = $(text);
-    $startGUI.find("#checkbox_prevent_streamer_select").prop("checked", settings.prevent_streamer_select);
-    $startGUI.find("#checkbox_auto_result_select").prop("checked", settings.auto_result_select);
-    $startGUI.find("#checkbox_poll_result_hide").prop("checked", settings.poll_result_hide);
-    $startGUI.find("#checkbox_skip_poll_for_goldcoins_and_chicken").prop("checked", settings.skip_poll_for_goldcoins_and_chicken);
-    $startGUI.find("#checkbox_subonly").prop("checked", settings.subonly);
-    
-    if(settings.prevent_streamer_select){
-        $startGUI.find("#checkbox_auto_result_select_container").hide();
-    }
-    else{
-        $startGUI.find("#checkbox_auto_result_select_container").show();
-    }
-    $startGUI.find("#checkbox_prevent_streamer_select").on("click", function(){
-        settings.prevent_streamer_select = !settings.prevent_streamer_select;
-        showCurrentMode();
-    });
-    $startGUI.find("#checkbox_auto_result_select").on("click", function(){
-        settings.auto_result_select = !settings.auto_result_select;
-        showCurrentMode();
-    });
-    $startGUI.find("#checkbox_poll_result_hide_container").on("click", function(){
-        settings.poll_result_hide = !settings.poll_result_hide;
-        showCurrentMode();
-    });
-    $startGUI.find("#checkbox_skip_poll_for_goldcoins_and_chicken_container").on("click", function(){
-        settings.skip_poll_for_goldcoins_and_chicken = !settings.skip_poll_for_goldcoins_and_chicken;
-        showCurrentMode();
-    });
-    $startGUI.find("#checkbox_subonly").on("click", function(){
-        settings.subonly = !settings.subonly;
-        showCurrentMode();
-    });
+        `;
+        var $startGUI = $(text);
+        $startGUI.find("#checkbox_prevent_streamer_select").prop("checked", settings.prevent_streamer_select);
+        $startGUI.find("#checkbox_auto_result_select").prop("checked", settings.auto_result_select);
+        $startGUI.find("#checkbox_poll_result_hide").prop("checked", settings.poll_result_hide);
+        $startGUI.find("#checkbox_skip_poll_for_goldcoins_and_chicken").prop("checked", settings.skip_poll_for_goldcoins_and_chicken);
+        $startGUI.find("#checkbox_subonly").prop("checked", settings.subonly);
+        
+        if(settings.prevent_streamer_select){
+            $startGUI.find("#checkbox_auto_result_select_container").hide();
+        }
+        else{
+            $startGUI.find("#checkbox_auto_result_select_container").show();
+        }
+        $startGUI.find("#checkbox_prevent_streamer_select").on("click", function(){
+            settings.prevent_streamer_select = !settings.prevent_streamer_select;
+            showCurrentMode();
+        });
+        $startGUI.find("#checkbox_auto_result_select").on("click", function(){
+            settings.auto_result_select = !settings.auto_result_select;
+            showCurrentMode();
+        });
+        $startGUI.find("#checkbox_poll_result_hide_container").on("click", function(){
+            settings.poll_result_hide = !settings.poll_result_hide;
+            showCurrentMode();
+        });
+        $startGUI.find("#checkbox_skip_poll_for_goldcoins_and_chicken_container").on("click", function(){
+            settings.skip_poll_for_goldcoins_and_chicken = !settings.skip_poll_for_goldcoins_and_chicken;
+            showCurrentMode();
+        });
+        $startGUI.find("#checkbox_subonly").on("click", function(){
+            settings.subonly = !settings.subonly;
+            showCurrentMode();
+        });
 
-    setTpvsDesc($startGUI);
+        setTpvsDesc($startGUI);
+    }
+    catch(e){
+        NOMO_DEBUG("error from showCurrentMode", e);
+    }
 }
 
 /////////////////////////
 // POST GAME 페이지 도달
 
 function highlightitem(wpind){
-    $("#polllist").find(".highlight_dub").removeClass("highlight_dub");
-    $("."+pollindex_seq[wpind]).addClass("highlight");
+    try{
+        $("#polllist").find(".highlight_dub").removeClass("highlight_dub");
+        $("."+pollindex_seq[wpind]).addClass("highlight");
+    }
+    catch(e){
+        NOMO_DEBUG("error from highlightitem", e);
+    }
 }
 function highlightitem_dub(wpind){
-    $("#polllist").find(".highlight").removeClass("highlight");
-    $("."+pollindex_seq[wpind]).addClass("highlight_dub");
+    try{
+        $("#polllist").find(".highlight").removeClass("highlight");
+        $("."+pollindex_seq[wpind]).addClass("highlight_dub");
+    }
+    catch(e){
+        NOMO_DEBUG("error from highlightitem_dub", e);
+    }
 }
 
 function resetLayout(){
@@ -1057,7 +1128,6 @@ function togglePollLayout(tg){
         $("#polllist").hide();
         $("#polltimer").hide();
     }
-
 }
 
 function showLayout(){
@@ -1069,29 +1139,34 @@ function hideLayout(){
 }
 
 function updateCount(force){
-    if(!force && !ispollstart){
-        return;
-    }
-    //NOMO_DEBUG("updateCount", pollcount);
-    if(!settings.poll_result_hide || force){
-        for(var i=1;i<=polln_total;++i){
-            var perText = "";
-            var rate = 0;
-            var per = 0;
-            if(pollcount_total != 0){
-                rate = pollcount[i] / pollcount_total;
-                per = rate * 100.0;
-                perText = ` (${per.toFixed(1)}%)`;
-            }
-            $(".cnt_"+i).html(pollcount[i]+perText);
-            $(".wpbg_"+i).css("width",`calc(${per}% + ${0.2*rate}vw)`);
+    try{
+        if(!force && !ispollstart){
+            return;
         }
+        //NOMO_DEBUG("updateCount", pollcount);
+        if(!settings.poll_result_hide || force){
+            for(var i=1;i<=polln_total;++i){
+                var perText = "";
+                var rate = 0;
+                var per = 0;
+                if(pollcount_total != 0){
+                    rate = pollcount[i] / pollcount_total;
+                    per = rate * 100.0;
+                    perText = ` (${per.toFixed(1)}%)`;
+                }
+                $(".cnt_"+i).html(pollcount[i]+perText);
+                $(".wpbg_"+i).css("width",`calc(${per}% + ${0.2*rate}vw)`);
+            }
+        }
+        else{
+            $(".cnt_"+i).html("???");
+            $(".wpbg_"+i).css("width",`0%`);
+        }
+        $(".totalcount_cnt").html(pollcount_total);    
     }
-    else{
-        $(".cnt_"+i).html("???");
-        $(".wpbg_"+i).css("width",`0%`);
+    catch(e){
+        NOMO_DEBUG("error from updateCount", e);
     }
-    $(".totalcount_cnt").html(pollcount_total);
 }
 
 function millisToMinutesAndSeconds(millis) {
@@ -1102,59 +1177,84 @@ function millisToMinutesAndSeconds(millis) {
 var timerInterval = undefined;
 const timer_margin = 900;
 function updateTimer(callback){
-    timerInterval = setInterval(function(){
-        updateCount();
-        var temp_date = new Date();
-        var time_in_ms = timer_margin + poll_time*1000 - (Number(temp_date) - Number(poll_time_startdate));
-        if(time_in_ms >= 0){
-            $("#polltimer").html(`${millisToMinutesAndSeconds(time_in_ms)}`);
-        }
-        else{
-            stopTimer();
-            if(callback !== undefined) callback();
-        }
-    }, 100);
+    try{
+        timerInterval = setInterval(function(){
+            updateCount();
+            var temp_date = new Date();
+            var time_in_ms = timer_margin + poll_time*1000 - (Number(temp_date) - Number(poll_time_startdate));
+            if(time_in_ms >= 0){
+                $("#polltimer").html(`${millisToMinutesAndSeconds(time_in_ms)}`);
+            }
+            else{
+                stopTimer();
+                if(callback !== undefined) callback();
+            }
+        }, 100);
+    }
+    catch(e){
+        NOMO_DEBUG("error from updateTimer", e);
+    }
 }
 function updatePureTimer(){
-    timerInterval = setInterval(function(){
-        var temp_date = new Date();
-        var time_in_ms = timer_margin + poll_time*1000 - (Number(temp_date) - Number(poll_time_startdate));
-        if(time_in_ms >= 0){
-            $("#polltimer").html(`${millisToMinutesAndSeconds(time_in_ms)}`);
-        }
-        else{
-            stopTimer();
-        }
-    }, 100);
+    try{
+        timerInterval = setInterval(function(){
+            var temp_date = new Date();
+            var time_in_ms = timer_margin + poll_time*1000 - (Number(temp_date) - Number(poll_time_startdate));
+            if(time_in_ms >= 0){
+                $("#polltimer").html(`${millisToMinutesAndSeconds(time_in_ms)}`);
+            }
+            else{
+                stopTimer();
+            }
+        }, 100);
+    }
+    catch(e){
+        NOMO_DEBUG("error from updatePureTimer", e);
+    }
 }
 
 function stopTimer(){
-    $("#polltimer").html(`${millisToMinutesAndSeconds(0)}`);
-    clearInterval(timerInterval);
+    try{
+        $("#polltimer").html(`${millisToMinutesAndSeconds(0)}`);
+        clearInterval(timerInterval);
+    }
+    catch(e){
+        NOMO_DEBUG("error from stopTimer", e);
+    }
 }
 
 var hidewelcomesignTimeout;
 function twitchPlayInit(){
-    createLayout();
-    if(isWellInjected){
-        setModStatus(getTpvsLang("scriptInitializeSucceed"));
-        readJson("TPVS_Settings.json", "settings");
-        getLang();
-        hideWelcomeSign(5000);
+    try{
+        createLayout();
+        if(isWellInjected){
+            setModStatus(getTpvsLang("scriptInitializeSucceed"));
+            readJson("TPVS_Settings.json", "settings");
+            getLang();
+            hideWelcomeSign(5000);
+        }
+        else{
+            $("#welcomesign").hide();
+            setModStatus(getTpvsLang("scriptInitializeFailed"));
+        }
+    
+        setTimeout(function(){
+            $("#modstatus").fadeOut(500);
+        },5000);
     }
-    else{
-        $("#welcomesign").hide();
-        setModStatus(getTpvsLang("scriptInitializeFailed"));
+    catch(e){
+        NOMO_DEBUG("error from twitchPlayInit", e);
     }
-
-    setTimeout(function(){
-        $("#modstatus").fadeOut(500);
-    },5000);
 }
 
 function hideWelcomeSign(delay){
-    clearTimeout(hidewelcomesignTimeout);
-    hidewelcomesignTimeout = setTimeout(function(){
-        $("#welcomesign").fadeOut(500);
-    },delay);
+    try{
+        clearTimeout(hidewelcomesignTimeout);
+        hidewelcomesignTimeout = setTimeout(function(){
+            $("#welcomesign").fadeOut(500);
+        },delay);
+    }
+    catch(e){
+        NOMO_DEBUG("error from hideWelcomeSign", e);
+    }
 }

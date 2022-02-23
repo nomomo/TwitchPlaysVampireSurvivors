@@ -55,3 +55,8 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer
 함께 설치된 TPVS.js 파일과 TPVS_Settings.json 파일은 지우든 안 지우든 상관 없습니다.
 
 또는 스팀에서 무결성 검사를 수행하면 덮어씌운 index.html 파일이 원래 내용으로 복구될 것입니다.
+
+## Q&A
+
+- Q: 투표는 어떻게 하나요?<br />A: !투표 1, !2, 2, 2222 등이 모두 투표에 반영됩니다. 22333 과 같이 적은 경우 맨 앞에 적은 숫자인 2가 투표에 반영됩니다.
+- Q: 투표한 아이템을 바꿀 수 있나요?<br />A: 투표한 내용은 매 번 갱신되므로, 투표 종료 직전까지 바꿀 수 있습니다.
