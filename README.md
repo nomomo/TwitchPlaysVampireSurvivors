@@ -2,6 +2,7 @@
 
 ## _당신의 마지막 상대에게 도전할 준비는 되었는가?_
 
+벌써 노업 하이퍼 유령런, 사신런을 정복하셨나요?.<br />
 매번 잘못된 훈수만 하는 트수들을 혼내줄 트수런을 소개합니다!<br />
 뱀파이버 서바이버의 모드 TPVS 는 **트위치 채팅을 통해 시청자들이 아이템을 투표할 수 있는 기능을 추가합니다.**<br />
 (본 모드는 뱀파이어 서바이버 v0.2.13c 버전에서 정상 동작하도록 개발되었습니다.)
@@ -11,17 +12,17 @@
 
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/1_poll.png)
 
-- 트수런 모드의 경우 레벨 업 화면에서 스트리머의 키보드 & 마우스 조작은 차단됩니다.
-- 투표 종료 후 아이템은 자동으로 선택되어 게임에 반영됩니다.
+- **트수런 모드**의 경우 레벨 업 화면에서 스트리머의 키보드 & 마우스 조작은 차단됩니다.
+- 투표 종료 후 아이템은 자동으로 선택되어 게임에 반영됩니다.<br />
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/2_tsr.png)
 
 ## 선택 가능한 옵션 
 
 메인 페이지에서 몇 가지 옵션을 선택할 수 있습니다.
 
-- 스트리머 아이템 선택 불가 옵션에 체크하면 트수런 모드가 됩니다.<br />뱀서의 권위자에게 트수런은 트수의 훈수따윈 무용하다는 것을 증명할 절호의 찬스입니다.<br />가차없이 썰어버리고 당신의 컨트롤을 증명하세요.<br />
+- 스트리머 아이템 선택 불가 옵션에 체크하면 **트수런 모드**가 됩니다.<br />뱀서의 권위자에게 트수런은 트수의 훈수따윈 무용하다는 것을 증명할 절호의 찬스입니다.<br />가차없이 썰어버리고 당신의 컨트롤을 증명하세요.<br />
 ![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/0_main_menu_option.png)
-- 스트리머 아이템 선택 불가 옵션을 체크 해제하면 훈수 모드가 됩니다.<br />무면허 뱀린이에게 유용할지도...?.<br />
+- 스트리머 아이템 선택 불가 옵션을 체크 해제하면 **훈수 모드**가 됩니다.<br />무면허 뱀린이에게 유용할지도...?<br />
 ![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/4_hunsu.png)
 - 토토와 함께하면 더욱 재밌어요
 
