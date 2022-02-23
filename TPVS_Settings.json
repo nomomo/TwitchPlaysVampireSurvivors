@@ -1,0 +1,15 @@
+{
+    "twitch_user_id" : "pingpink",
+
+    "poll_time" : 15,
+    "poll_restart_time" : 5,
+    "auto_result_select_delay_time" : 5,
+
+    "prevent_streamer_select" : true,
+    "auto_result_select" : false,
+    "poll_result_hide" : false,
+    "skip_poll_for_goldcoins_and_chicken" : false,
+    "subonly" : false,
+
+    "language" : "ko"
+}
