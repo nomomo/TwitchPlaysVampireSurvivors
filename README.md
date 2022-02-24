@@ -32,18 +32,18 @@
 
 본 모드는 현재 뱀파이어 서바이버 v0.2.13c 버전에서 작동하도록 개발되었습니다.
 
-1. 아래 링크로 접속해 모드 파일을 다운로드 받습니다.
+1. 아래 링크로 접속해 모드 최신 버전의 압축 파일을 다운로드 받습니다.
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
-![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/5_download.png)
+![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/5_download.png)<br />
 위 그림의 경우 Mod 의 버전은 v0.0.1 이고, 뱀파이어 서바이버 v0.2.13c 버전에서 작동한다는 뜻입니다.
 
-2. 압축 해제 후, 다음의 폴더에 덮어쓰기 합니다.
-기본 설치 경로의 경우 다음과 같습니다.
-Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer
+2. 압축 해제 후 생성된 모든 파일을 다음의 폴더에 덮어쓰기 합니다.<br />
+기본 설치 경로의 경우 다음과 같습니다.<br />
+Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer<br />
 ![copy_files](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/6_install.png)
 
-3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 를 본인 Twitch ID 로 설정하세요.
-![set_twitch_id](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/3_settings.png)
+3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 를 본인 Twitch ID 로 설정하세요.<br />
+![set_twitch_id](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/3_settings.png)<br />
 그 외 투표 시간 등은 조절하든 말든 맘대로 하세요~
 
 4. 준비는 끝! 게임을 실행합니다.
