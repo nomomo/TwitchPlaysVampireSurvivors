@@ -22,6 +22,7 @@ var settings = {
 
     subonly : false,
     
+    play_sound_effect : true,
     language:"ko"
 };
 
@@ -110,6 +111,51 @@ Element.prototype.addEventListener = eventcatch;
 
 
 ////////////////////////////////////////////////////////////////////
+// Audio
+////////////////////////////////////////////////////////////////////
+var audioPollFinishSound = undefined;
+function loadSoundFiles(){
+    try{
+        if(!settings.play_sound_effect){
+            return;
+        }
+        audioPollFinishSound = new Audio("PollFinishSound.mp3");
+        document.body.appendChild(audioPollFinishSound);
+        // var xhr = new XMLHttpRequest();
+        // xhr.open('POST', "PollFinishSound.mp3", true);
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        // xhr.responseType = 'blob';
+        // xhr.onload = function(evt) {
+        //   var blob = new Blob([xhr.response], {type: 'audio/mp3'});
+        //   var objectUrl = URL.createObjectURL(blob);
+        //   var audioPollFinishSound = new Audio(objectUrl);
+        //   document.body.appendChild(audioPollFinishSound);
+        //   // audio.src = objectUrl;
+        //   // Release resource when it's loaded
+        //   audioPollFinishSound.onload = function(evt) {
+        //         URL.revokeObjectURL(objectUrl);
+        //   };
+        // };
+        // xhr.send(null);
+    }
+    catch(e){
+        NOMO_DEBUG("error from loadSoundFiles", e);
+    }
+}
+function playPollEndSound(){
+    try{
+        NOMO_DEBUG("playPollEndSound()");
+        if(!settings.play_sound_effect || audioPollFinishSound === undefined) return;
+        audioPollFinishSound.pause();
+        audioPollFinishSound.currentTime = 0;
+        audioPollFinishSound.play();
+    }
+    catch(e){
+        NOMO_DEBUG("error from playPollEndSound", e);
+    }
+};
+
+////////////////////////////////////////////////////////////////////
 // Language
 ////////////////////////////////////////////////////////////////////
 var weaponLang = {}, itemLang = {}, Lang = {};
@@ -125,6 +171,7 @@ function readJson(filename, varname){
         switch (varname){
             case "settings":
                 TwitchChatConnect();
+                loadSoundFiles();
                 break;
             case "weaponLang":
                 for(key in weaponLang["en"]["translations"]){
@@ -857,6 +904,7 @@ function checkPollEnd(){
             else{
                 updateCount(true);
                 setTpvsDesc(getTpvsLang("letsSelectItem"));
+                playPollEndSound();
             }
 
             // highlight same values
@@ -885,6 +933,7 @@ function checkPollEnd(){
             
             if(settings.prevent_streamer_select || settings.auto_result_select){
                 setTpvsDesc(getTpvsLang("waitingAutoResultSelectDelay"));
+                playPollEndSound();
                 updateCount(true);
                 poll_time_startdate = new Date();
                 poll_time = settings.auto_result_select_delay_time;
@@ -897,6 +946,7 @@ function checkPollEnd(){
             else{
                 updateCount(true);
                 setTpvsDesc(getTpvsLang("letsSelectItem"));
+                playPollEndSound();
             }
         }
     }

@@ -11,5 +11,6 @@
     "skip_poll_for_goldcoins_and_chicken" : false,
     "subonly" : false,
 
+    "play_sound_effect" : true,
     "language" : "ko"
 }
