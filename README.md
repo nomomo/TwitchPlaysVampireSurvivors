@@ -65,3 +65,9 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer<br />
 
 - Q: 투표는 어떻게 하나요?<br />A: !투표 1, !2, 2, 2222 등이 모두 투표에 반영됩니다. 22333 과 같이 적은 경우 맨 앞에 적은 숫자인 2가 투표에 반영됩니다.
 - Q: 투표한 아이템을 바꿀 수 있나요?<br />A: 투표한 내용은 매 번 갱신되므로, 투표 종료 직전까지 바꿀 수 있습니다.
+
+## 제작자
+
+- NOMO@핑크요정_
+- nomotg@gmail.com
+- [nomo.asia](https://nomo.asia)
