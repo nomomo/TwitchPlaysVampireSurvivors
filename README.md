@@ -30,6 +30,8 @@
 
 ## 모드 설치 방법
 
+본 모드는 현재 뱀파이어 서바이버 v0.2.13c 버전에서 작동하도록 개발되었습니다.
+
 1. 아래 링크로 접속해 모드 파일을 다운로드 받습니다.
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
 ![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/5_download.png)
@@ -47,10 +49,10 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer
 4. 준비는 끝! 게임을 실행합니다.
     - 게임 실행 후, 화면 좌측 하단에 "TPVS 모드가 성공적으로 초기화 되었습니다"라는 메시지가 나타났다면 정상적으로 모드가 실행된 것입니다.
     - 그 외의 메시지가 나타난 경우, 뱀파이어 서바이버의 버전업으로 인하여 모드가 작동하지 않는 경우이니, 이 경우 제작자 이메일인 nomotg@gmail.com 으로 제보해주세요!
-    - 모드가 제대로 작동하지 않는 경우에도 위 이메일로 제보해주세요!
+    - 모드가 제대로 작동하지 않거나 오류가 발생하는 경우에도 위 이메일로 제보해주세요!
 
 5. 뱀파이버 서바이버가 버전업 되는 경우, 모드 파일 중 index.html 파일만 다시 덮어씌우면 됩니다.
-그런데 버전업 시 모드 수정 없이 기존 모드가 정상 동작할 가능성은 그다지 높지 않습니다. 자세한 설명은 생략...😥
+그런데 버전업 시 모드 수정 없이 기존 모드가 정상 동작할 가능성은 그다지 높지 않습니다.
 
 ## 모드 제거 방법
 
