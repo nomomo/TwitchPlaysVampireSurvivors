@@ -43,7 +43,7 @@
 Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer<br />
 ![copy_files](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/6_install.png)
 
-3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 를 본인 Twitch ID 로 설정하세요.<br />
+3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 를 본인 Twitch ID 로 설정하세요.<br />인게임에서도 변경 가능합니다.<br />
 ![set_twitch_id](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/3_settings.png)
 
 4. 준비는 끝! 게임을 실행합니다.
