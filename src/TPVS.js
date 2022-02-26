@@ -253,6 +253,8 @@ var tpvsLang = {
         "lastSelectedItem":"선택",
         "subonlypoll":"구독자 전용 투표",
         "playSoundEffect":"효과음 재생",
+        "detailSettings":"상세 설정",
+        "back":"뒤로",
         "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다.",
         "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. 개발자에게 문의해주세요!"
     },
@@ -281,6 +283,8 @@ var tpvsLang = {
         "lastSelectedItem":"ITEM",
         "subonlypoll":"Subscriber only poll",
         "playSoundEffect":"Play sound effect",
+        "detailSettings":"More options",
+        "back":"Back",
         "scriptInitializeSucceed":"The mod has been successfully initialized.",
         "scriptInitializeFailed":"TPVS Mod initialization failed. The mode is disabled. Contact the developer for more details!"
     }
@@ -1221,8 +1225,8 @@ function showCurrentMode(pageNo){
                     <label id="checkbox_subonly_container">${getTpvsLang("subonlypoll")} <input type="checkbox" setting="subonly" /></label>
                     <label id="checkbox_play_sound_effect_container">${getTpvsLang("playSoundEffect")} <input type="checkbox" setting="play_sound_effect" /></label>
                     <div id="pageBtnContainer">
-                        <span id="goto2ndpage" class="pageBtn">상세 설정 ></span>
-                        <span id="backto1stpage" class="pageBtn">< 뒤로</span>
+                        <span id="goto2ndpage" class="pageBtn">${getTpvsLang("detailSettings")} ></span>
+                        <span id="backto1stpage" class="pageBtn">< ${getTpvsLang("back")}</span>
                     </div>
                 </div>
             </div>
