@@ -15,16 +15,17 @@
 
 - **트수런 모드**의 경우 레벨 업 화면에서 스트리머의 키보드 & 마우스 조작은 차단됩니다.
 - 투표 종료 후 아이템은 자동으로 선택되어 게임에 반영됩니다.<br />
-![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/2_tsr.png)
+![tsurun](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/2_tsr.png)
 
 ## 선택 가능한 옵션 
 
-메인 페이지에서 몇 가지 옵션을 선택할 수 있습니다.
+메인 페이지에서 플레이 모드를 선택할 수 있습니다.
 
 - 스트리머 아이템 선택 불가 옵션에 체크하면 **트수런 모드**가 됩니다.<br />뱀서의 권위자에게 트수런은 트수의 훈수따윈 무용하다는 것을 증명할 절호의 찬스입니다.<br />가차없이 썰어버리고 당신의 컨트롤을 증명하세요.<br />
-![main_menu_options](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/0_main_menu_option.png)
 - 스트리머 아이템 선택 불가 옵션을 체크 해제하면 **훈수 모드**가 됩니다.<br />무면허 뱀린이에게 유용할지도...?<br />
-![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/4_hunsu.png)
+![Play Mode](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/mode.png)
+- 상세 설정에서 몇 가지 옵션을 설정할 수 있습니다.<br />
+![Detail Settings](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/detailSettings.png)
 - 토토와 함께하면 더욱 재밌어요
 
 ## 모드 설치 방법
@@ -41,7 +42,6 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer
 
 3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 를 본인 Twitch ID 로 설정하세요.
 ![set_twitch_id](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/3_settings.png)
-그 외 투표 시간 등은 조절하든 말든 맘대로 하세요~
 
 4. 준비는 끝! 게임을 실행합니다.
     - 게임 실행 후, 화면 좌측 하단에 "TPVS 모드가 성공적으로 초기화 되었습니다"라는 메시지가 나타났다면 정상적으로 모드가 실행된 것입니다.
@@ -62,3 +62,9 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer
 
 - Q: 투표는 어떻게 하나요?<br />A: !투표 1, !2, 2, 2222 등이 모두 투표에 반영됩니다. 22333 과 같이 적은 경우 맨 앞에 적은 숫자인 2가 투표에 반영됩니다.
 - Q: 투표한 아이템을 바꿀 수 있나요?<br />A: 투표한 내용은 매 번 갱신되므로, 투표 종료 직전까지 바꿀 수 있습니다.
+
+## Change log
+
+- v0.0.3 (2022-02-26): 설정 변경 시 자동 저장 & 옵션 설정 화면 변경
+- v0.0.2 (2022-02-25): 투표 종료 시 효과음 추가
+- v0.0.1 (2022-02-24): 첫 공개

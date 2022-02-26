@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
-var settings = {
+var settings_init = {
     twitch_user_id : "pingpink",
 
     poll_time : 15,
@@ -25,6 +25,8 @@ var settings = {
     play_sound_effect : true,
     language:"ko"
 };
+var settings = JSON.parse(JSON.stringify(settings_init));
+var settings_temp;
 
 if(window === undefined && global !== undefined){
     var window = global;
@@ -169,7 +171,13 @@ function readJson(filename, varname){
 
         // special work after read json file
         switch (varname){
-            case "settings":
+            case "settings_temp":
+                for(var settingsKey in settings_temp){
+                    NOMO_DEBUG(settingsKey)
+                    if(settings[settingsKey] !== undefined){
+                        settings[settingsKey] = settings_temp[settingsKey];
+                    }
+                }
                 TwitchChatConnect();
                 loadSoundFiles();
                 break;
@@ -223,7 +231,7 @@ var tpvsLang = {
     "ko":{
         "twitchConnecting":"Twitch 채팅과 연결 중입니다.",
         "twitchConnected":"Twitch 채팅과 연결되었습니다.",
-        "twitchDisconnected":"Twitch 채팅 서버와 연결하지 못했습니다.",
+        "twitchDisconnected":"Twitch 채팅과 연결이 끊겼습니다.",
         "pickaitem":"아이템을 선택하세요!",
         "letsPoll":"원하는 아이템 번호를 채팅창에 입력하세요.<br />예: !투표 1 or !2 or 3 or 111",
         "tiePoll":`동점으로 인해 투표가 연장됩니다!`,
@@ -233,6 +241,10 @@ var tpvsLang = {
         "currentmode_soft":"현재 모드는 <strong>훈수 모드</strong> 입니다. 투표는 진행되지만, 결과에 따른 아이템 선택은 스트리머가 직접 진행해야 합니다.",
         "isStrict":"스트리머 아이템 선택 불가(트수런)",
         "isAutoselect":"투표 후 결과 자동 선택",
+        "connect":"연결",
+        "pollTime":"투표 시간(s)",
+        "pollRestartTme":"재투표 시간(s)",
+        "pollResultShowTme":"투표 결과 표시 시간(s)",
         "isSkipGoldcoinAndChicken":"골드와 치킨에 대해 투표하지 않음",
         "hidePollDuringPoll":"투표 진행 상황 숨김",
         "waitingAutoResultSelectDelay":`잠시 후 아이템이 자동으로 선택됩니다.`,
@@ -240,6 +252,7 @@ var tpvsLang = {
         "totalcount":"총 투표 수",
         "lastSelectedItem":"선택",
         "subonlypoll":"구독자 전용 투표",
+        "playSoundEffect":"효과음 재생",
         "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다.",
         "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. 개발자에게 문의해주세요!"
     },
@@ -256,6 +269,10 @@ var tpvsLang = {
         "currentmode_soft":"Current mode: Soft<br />- The streamer proceeds to select an item according to the poll result.",
         "isStrict":"Use Strict Mode",
         "isAutoselect":"Auto-select item after poll",
+        "connect":"Connect",
+        "pollTime":"Poll time(s)",
+        "pollRestartTme":"Poll time in case of tie(s)",
+        "pollResultShowTme":"Poll result display time(s)",
         "isSkipGoldcoinAndChicken":"Skip poll for gold coins and chicken",
         "hidePollDuringPoll":"Hide the number of votes during a poll",
         "waitingAutoResultSelectDelay":`After a while, the item will be selected automatically`,
@@ -263,6 +280,7 @@ var tpvsLang = {
         "totalcount":"Total votes",
         "lastSelectedItem":"ITEM",
         "subonlypoll":"Subscriber only poll",
+        "playSoundEffect":"Play sound effect",
         "scriptInitializeSucceed":"The mod has been successfully initialized.",
         "scriptInitializeFailed":"TPVS Mod initialization failed. The mode is disabled. Contact the developer for more details!"
     }
@@ -469,6 +487,7 @@ const tpvs_style = /*css*/`
 
 
 #pollContainer.main {
+    width: 18vw;
     bottom: 6.5vh;
     right: 6.5vw;
 }
@@ -480,6 +499,7 @@ const tpvs_style = /*css*/`
 #pollContainer label{
     display:block;
     cursor:pointer;
+    clear:both;
 }
 
 #pollContainer table{
@@ -524,11 +544,15 @@ const tpvs_style = /*css*/`
 }
 
 #twitchChatStatus{
+    font-size: 0.9vw;
     color: #9146FF;
     font-weight: bold;
+    padding: 0;
+    box-sizing: border-box;
+    word-break: keep-all;
 }
 
-#twitchChatStatus, #tpvs_desc {
+#tpvs_desc {
     font-size: 1vw;
     padding: 0;
     box-sizing: border-box;
@@ -543,6 +567,64 @@ const tpvs_style = /*css*/`
     text-align: right;
     white-space: nowrap;
 }
+
+#tpvsSettingContainer #textbox_twitch_user_id_container{
+    cursor:auto;
+}
+#tpvsSettingContainer #textbox_twitch_user_id_container input{
+    cursor:text;
+    float:unset;
+    font-size: 1vw;
+    width:7vw;
+    height: 1.4vw;
+    box-sizing: border-box;
+}
+#tpvsSettingContainer #TwitchConnectBtn{
+    cursor: pointer;
+    font-size: 0.7vw;
+    color: #fff;
+    background-color: #9146FF;
+    border: 0.01vw solid #000;
+    height: 1.4vw;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 0.2vw;
+    padding: 0.1vw 0.2vw;
+    box-sizing: border-box;
+}
+
+#tpvsSettingContainer #TwitchConnectBtn:hover{
+    background-color:#832eff;
+}
+
+#tpvsSettingContainer input{
+    float:right;
+}
+#tpvsSettingContainer input[type=number]{
+    font-size: 0.9vw;
+    width: 3vw;
+    height: 0.9vw;
+    margin-top: 0.2vw;
+    margin-right: 0.15vw;
+}
+#tpvsSettingContainer input[type=number]::-webkit-inner-spin-button {
+    opacity: 1;
+}
+
+#pageBtnContainer{
+    margin-top: 0.2vw;
+    clear: both;
+    text-align: right;
+}
+#pageBtnContainer .pageBtn{
+    color:#999;
+    text-align:right;
+    cursor:pointer;
+}
+#pageBtnContainer .pageBtn:hover{
+    color:#fff;
+}
+
 `;
 $("head").append(`<style>${tpvs_style}</style>`);
 
@@ -576,9 +658,32 @@ function TwitchChatConnect(){
     }
 }
 
+function TwitchChatReconnect(){
+    try{
+        var delay = 100;
+        if(twitchChatConnected){
+            client.disconnect();
+            delay = 500;
+        }
+        if($("#textbox_twitch_user_id").length !== 0){
+            settings.twitch_user_id = $("#textbox_twitch_user_id").val();
+            writeSettingJson();
+        }
+        setTimeout(function(){
+            $("#twitchChatStatus").html(`${getTpvsLang("twitchConnecting")} (${settings.twitch_user_id})`);
+            TwitchChatConnect();
+        },delay);
+    }
+    catch(e){
+        NOMO_DEBUG("ERROR FROM TwitchChatReconnect", e);
+    }
+}
+
+
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
     try{
+        NOMO_DEBUG("[chat]",context.username,context["display-name"],msg)
         if (self) { return; } // Ignore messages from the bot
         if (settings.subonly && !context.subscriber){ return; } // subonly poll option
         if (ispollstart){
@@ -1082,59 +1187,155 @@ function updateTwitchChatStatus(){
         $("#twitchChatStatus").html(getTpvsLang("twitchConnected") + " (" + settings.twitch_user_id + ")");
     }
     else{
-        $("#twitchChatStatus").html(getTpvsLang("twitchDisonnected") + " (" + settings.twitch_user_id + ")");
+        $("#twitchChatStatus").html(getTpvsLang("twitchDisconnected") + " (" + settings.twitch_user_id + ")");
     }
 }
 
-function showCurrentMode(){
+function showCurrentMode(pageNo){
     try{
-        var text = `
-        <div style="padding-top:1vw;">
-            ${settings.prevent_streamer_select ? getTpvsLang("currentmode_strict") : getTpvsLang("currentmode_soft")}
-            <div style="padding-top:1vw;">
-                <label id="checkbox_prevent_streamer_select">${getTpvsLang("isStrict")} <input type="checkbox" id="checkbox_prevent_streamer_select" /></label>
-                <label id="checkbox_auto_result_select_container">${getTpvsLang("isAutoselect")} <input type="checkbox" id="checkbox_auto_result_select" /></label>
-                <label id="checkbox_poll_result_hide_container">${getTpvsLang("hidePollDuringPoll")} <input type="checkbox" id="checkbox_poll_result_hide" /></label>
-                <label id="checkbox_skip_poll_for_goldcoins_and_chicken_container">${getTpvsLang("isSkipGoldcoinAndChicken")} <input type="checkbox" id="checkbox_skip_poll_for_goldcoins_and_chicken" /></label>
-                <label id="checkbox_subonly_container">${getTpvsLang("subonlypoll")} <input type="checkbox" id="checkbox_subonly" /></label>
+        if(pageNo === undefined){
+            pageNo = 0;
+        }
+
+        var $startGUI;
+        if($("tpvsSettingContainer").length == 0){
+            var text = `
+            <div id="tpvsSettingContainer" style="padding-top:1vw;">
+                <div id="modeDisc">
+                    ${settings.prevent_streamer_select ? getTpvsLang("currentmode_strict") : getTpvsLang("currentmode_soft")}
+                </div>
+                <div style="">
+                    <label style="padding-bottom:1vw;" id="textbox_twitch_user_id_container">Twitch ID 
+                        <div style="float:right;"><input type="text" id="textbox_twitch_user_id" setting="twitch_user_id" spellcheck="false" /> <span id="TwitchConnectBtn">${getTpvsLang("connect")}</span></div>
+                    </label>
+                    <label style="padding-top:1vw;" id="checkbox_prevent_streamer_select">${getTpvsLang("isStrict")} <input type="checkbox" setting="prevent_streamer_select" /></label>
+                    <label id="checkbox_auto_result_select_container">${getTpvsLang("isAutoselect")} <input type="checkbox" setting="auto_result_select" /></label>
+                    <label class="emptyLine">　</label>
+                    
+                    <label id="pollTime_Container">${getTpvsLang("pollTime")} <input type="number" setting="poll_time" value=20 min=0 max=9999 /></label>
+                    <label id="pollRestartTme_Container">${getTpvsLang("pollRestartTme")} <input type="number" setting="poll_restart_time" value=20 min=0 max=9999 /></label>
+                    <label style="margin-bottom:1vw;" id="pollResultShowTme_Container">${getTpvsLang("pollResultShowTme")} <input type="number" setting="auto_result_select_delay_time" value=20 min=0 max=9999 /></label>
+
+                    <label id="checkbox_poll_result_hide_container">${getTpvsLang("hidePollDuringPoll")} <input type="checkbox" setting="poll_result_hide" /></label>
+                    <label id="checkbox_skip_poll_for_goldcoins_and_chicken_container">${getTpvsLang("isSkipGoldcoinAndChicken")} <input type="checkbox" setting="skip_poll_for_goldcoins_and_chicken" /></label>
+                    <label id="checkbox_subonly_container">${getTpvsLang("subonlypoll")} <input type="checkbox" setting="subonly" /></label>
+                    <label id="checkbox_play_sound_effect_container">${getTpvsLang("playSoundEffect")} <input type="checkbox" setting="play_sound_effect" /></label>
+                    <div id="pageBtnContainer">
+                        <span id="goto2ndpage" class="pageBtn">상세 설정 ></span>
+                        <span id="backto1stpage" class="pageBtn">< 뒤로</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        `;
-        var $startGUI = $(text);
-        $startGUI.find("#checkbox_prevent_streamer_select").prop("checked", settings.prevent_streamer_select);
-        $startGUI.find("#checkbox_auto_result_select").prop("checked", settings.auto_result_select);
-        $startGUI.find("#checkbox_poll_result_hide").prop("checked", settings.poll_result_hide);
-        $startGUI.find("#checkbox_skip_poll_for_goldcoins_and_chicken").prop("checked", settings.skip_poll_for_goldcoins_and_chicken);
-        $startGUI.find("#checkbox_subonly").prop("checked", settings.subonly);
-        
-        if(settings.prevent_streamer_select){
-            $startGUI.find("#checkbox_auto_result_select_container").hide();
+            `;
+            $startGUI = $(text);
+            $startGUI.find("input").on("change", function(e){
+                NOMO_DEBUG("CHANGE EVENT", e);
+                var $v = $(e.target);
+                var settingVal;
+                if($v.attr("type") === "text"){
+                    return;
+                }
+                else if($v.attr("type") === "checkbox"){
+                    settingVal = $v.prop("checked");
+                }
+                else{
+                    settingVal = $v.val();
+                }
+                
+                if($v.attr("type") === "number"){
+                    settingVal = Number(settingVal);
+                }
+                var settingName = $v.attr("setting");
+                settings[settingName] = settingVal;
+                NOMO_DEBUG(settingName, settingVal);
+
+                if(settingName === "prevent_streamer_select"){
+                    if(settingVal){
+                        $startGUI.find("#modeDisc").html(getTpvsLang("currentmode_strict"));
+                        $startGUI.find("#checkbox_auto_result_select_container").hide();
+                        $startGUI.find(".emptyLine").show();
+                    }
+                    else{
+                        $startGUI.find("#modeDisc").html(getTpvsLang("currentmode_soft"));
+                        $startGUI.find("#checkbox_auto_result_select_container").show();
+                        $startGUI.find(".emptyLine").hide();
+                    }
+                }
+                writeSettingJson();
+            });
+            $startGUI.find("#goto2ndpage").on("click", function(){
+                showCurrentMode(1)
+            });
+            $startGUI.find("#backto1stpage").on("click", function(){
+                showCurrentMode(0);
+            });
+            $startGUI.find("#TwitchConnectBtn").on("click", function(){
+                TwitchChatReconnect();
+            });
+            setTpvsDesc($startGUI);
         }
         else{
-            $startGUI.find("#checkbox_auto_result_select_container").show();
+            $startGUI = $("tpvsSettingContainer");
         }
-        $startGUI.find("#checkbox_prevent_streamer_select").on("click", function(){
-            settings.prevent_streamer_select = !settings.prevent_streamer_select;
-            showCurrentMode();
-        });
-        $startGUI.find("#checkbox_auto_result_select").on("click", function(){
-            settings.auto_result_select = !settings.auto_result_select;
-            showCurrentMode();
-        });
-        $startGUI.find("#checkbox_poll_result_hide_container").on("click", function(){
-            settings.poll_result_hide = !settings.poll_result_hide;
-            showCurrentMode();
-        });
-        $startGUI.find("#checkbox_skip_poll_for_goldcoins_and_chicken_container").on("click", function(){
-            settings.skip_poll_for_goldcoins_and_chicken = !settings.skip_poll_for_goldcoins_and_chicken;
-            showCurrentMode();
-        });
-        $startGUI.find("#checkbox_subonly").on("click", function(){
-            settings.subonly = !settings.subonly;
-            showCurrentMode();
-        });
 
-        setTpvsDesc($startGUI);
+        var $input = $startGUI.find("input");
+        $input.each(function(i,v){
+            var $v = $(v);
+            var settingName = $v.attr("setting");
+            var settingVal = settings[settingName];
+            if($(v).attr("type") === "checkbox"){
+                $v.prop("checked",settingVal);
+            }
+            else{
+                $v.val(settingVal);
+            }
+        });
+        
+        var page = [
+            [
+                "#modeDisc",
+                "#checkbox_prevent_streamer_select",
+                "#checkbox_auto_result_select_container",
+                "#goto2ndpage",
+                ".emptyLine"
+            ],
+            [
+                "#textbox_twitch_user_id_container",
+                "#checkbox_poll_result_hide_container",
+                "#checkbox_skip_poll_for_goldcoins_and_chicken_container",
+                "#checkbox_subonly_container",
+                "#pollTime_Container",
+                "#pollRestartTme_Container",
+                "#pollResultShowTme_Container",
+                "#checkbox_play_sound_effect_container",
+                "#backto1stpage"
+            ]
+        ];
+
+        for(var i=0;i<page.length;i++){
+            for(var j=0;j<page[i].length;j++){
+                $startGUI.find(page[i][j]).hide();
+            }
+        }
+        for(var i=0;i<page[pageNo].length;i++){
+            $startGUI.find(page[pageNo][i]).show();
+        }
+
+        if(pageNo !== 0){
+            $startGUI.find("#checkbox_auto_result_select_container").hide();
+            $startGUI.find(".emptyLine").hide();
+        }
+        else{
+            if(settings.prevent_streamer_select){
+                $startGUI.find("#checkbox_auto_result_select_container").hide();
+                $startGUI.find(".emptyLine").show();
+            }
+            else{
+                $startGUI.find("#checkbox_auto_result_select_container").show();
+                $startGUI.find(".emptyLine").hide();
+            }
+        }
+
     }
     catch(e){
         NOMO_DEBUG("error from showCurrentMode", e);
@@ -1279,7 +1480,7 @@ function twitchPlayInit(){
         createLayout();
         if(isWellInjected){
             setModStatus(getTpvsLang("scriptInitializeSucceed"));
-            readJson("TPVS_Settings.json", "settings");
+            readJson("TPVS_Settings.json", "settings_temp");
             getLang();
             hideWelcomeSign(5000);
         }
@@ -1306,5 +1507,33 @@ function hideWelcomeSign(delay){
     }
     catch(e){
         NOMO_DEBUG("error from hideWelcomeSign", e);
+    }
+}
+
+//////////////////////////////////////////////////////////
+// load fs library to write setting file
+try{
+    if(require !== undefined && window["fs"] === undefined){
+        window["fs"]=require('fs');
+    }
+}
+catch(e){
+    NOMO_DEBUG("error from load fs library", e);
+}
+
+function writeSettingJson(){
+    try{
+        if(window["fs"] === undefined){
+            return;
+        }
+        if(typeof window["fs"] !== undefined){
+            window["fs"].writeFile ("./resources/app/.webpack/renderer/TPVS_Settings.json", JSON.stringify(settings, null, 4), function(err) {
+                    if (err) throw err;
+                }
+            );
+        }
+    }
+    catch(e){
+        NOMO_DEBUG("error from writeSettingJson", e);
     }
 }
