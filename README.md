@@ -31,7 +31,7 @@
 
 ## 모드 설치 방법
 
-본 모드는 현재 뱀파이어 서바이버 v0.2.13c 버전에서 작동하도록 개발되었습니다.
+본 모드는 뱀파이어 서바이버 v0.2.13c 정식 버전과 v0.3.0 베타 버전에서 작동하는 것을 확인했습니다.
 
 1. 아래 링크로 접속해 모드 최신 버전의 압축 파일을 다운로드 받습니다.
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
@@ -52,7 +52,6 @@ Steam\steamapps\common\Vampire Survivors\resources\app\.webpack\renderer<br />
     - 모드가 제대로 작동하지 않거나 오류가 발생하는 경우에도 위 이메일로 제보해주세요!
 
 5. 뱀파이버 서바이버가 버전업 되는 경우, 모드 파일 중 index.html 파일만 다시 덮어씌우면 됩니다.
-그런데 버전업 시 모드 수정 없이 기존 모드가 정상 동작할 가능성은 그다지 높지 않습니다.
 
 ## 모드 제거 방법
 
