@@ -256,7 +256,7 @@ var tpvsLang = {
         "detailSettings":"상세 설정",
         "back":"뒤로",
         "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다.",
-        "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. 개발자에게 문의해주세요!"
+        "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. 뱀서가 업데이트 된 경우 개발자에게 연락하여 패치를 요청해주세요!"
     },
     "en":{
         "twitchConnecting":"Connecting with the Twitch chat.",
@@ -317,22 +317,24 @@ document.head.appendChild(script);
 
 const injectionFromTo = [
     [
-        ["]('menu_start')","]('menu_start'),tpvs_startPage()"]
+        [/(\]\('menu_start'\))/g,"$1,tpvs_startPage()"]
     ],
     [ 
-        ["]('postGame_header')","]('postGame_header'),tpvs_postGame()"]
+        [/(\]\('postGame_header'\))/g,"$1,tpvs_postGame()"]
     ],
     [ 
-        ["]('character_header')","]('character_header'),tpvs_startGame()"]
+        [/(\]\('character_header'\))/g,"$1,tpvs_startGame()"]
     ],
     [ 
-        ["]('options_header')","]('options_header'),tpvs_startPage()"]
+        [/(\]\('options_header'\))/g,"$1,tpvs_startPage()"]
     ],
     [ 
-        ["['BackFromCharSelectionScene'](){","['BackFromCharSelectionScene'](){tpvs_startPage();"]
+        [/(\['BackFromCharSelectionScene'\]\(\)\{)/g,"$1tpvs_startPage();"],    // for v0.2.13c
+        [/(this\['UI_overlayScene'\].+\(!0x1,this\['CharSelectionScene'\])/g, "tpvs_startPage();$1"]    // for v0.3.0c
+
     ],
     [ 
-        ["]('levelup_header')","]('levelup_header'),window.tpvs=this,tpvs_startPoll()"]
+        [/(\]\('levelup_header'\))/g,"$1,window.tpvs=this,tpvs_startPoll()"]
     ],
 ]
 
@@ -352,7 +354,7 @@ function injectScript(script_ori){
                 var from = scriptSnippet[0];
                 var to = scriptSnippet[1];
                 NOMO_DEBUG("fromto", from, to);
-                if(script_ori.indexOf(from) !== -1){
+                if(script_ori.match(from) !== null){
                     canbeinjected = true;
                     injectionIndex = j;
                     break;
@@ -399,7 +401,8 @@ rawFileMain.onload  = function() {
     //     .replace("]('options_header')","]('options_header'),tpvs_startPage()")
     //     .replace("['BackFromCharSelectionScene'](){","['BackFromCharSelectionScene'](){tpvs_startPage();")
     //     .replace("]('levelup_header')","]('levelup_header'),window.tpvs=this,tpvs_startPoll()");
-    //rawFileMainText = rawFileMainText.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':10000000000.03,")
+    //rawFileMainText = rawFileMainText.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':10.03,");
+    //rawFileMainText = rawFileMainText.replace("'price':0xc8,'power':0.05,","'price':0xc8,'power':100.05,");
     rawFileMainText = injectScript(rawFileMainText);
     eval(rawFileMainText);
 };
