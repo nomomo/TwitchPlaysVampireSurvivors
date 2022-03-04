@@ -31,7 +31,7 @@
 
 ## 모드 설치 방법
 
-본 모드는 22년 3월 3일 오후 11시 기준 뱀파이어 서바이버 v0.3.0c 정식 버전에서 작동됩니다.
+본 모드는 22년 3월 4일 오후 11시 기준 뱀파이어 서바이버 v0.3.0c 정식 버전에서 작동됩니다.
 
 1. 아래 링크로 접속해 모드 최신 버전의 압축 파일을 다운로드 받습니다.
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
