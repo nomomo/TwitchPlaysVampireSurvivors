@@ -1138,12 +1138,12 @@ function tpvs_startPoll(polltype){
             if(polltype == 0 && tpvs.HasRerolls){
                 polln_total = polln_total + 1;
                 pollindex_seq[polln_total] = "REROLL";
-                $("#polllist_ul").append(`<tr class="REROLL"><td class="wp">${polln_total}. ${getWeaponName("REROLL")}</td><td class="cnt cnt_${polln_total}">0</span></tr>`);
+                $("#polllist_ul").append(`<tr class="REROLL"><td class="wp">${polln_total}. ${getWeaponName("REROLL")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
             }
             if(polltype == 0 && tpvs.HasSkips){
                 polln_total = polln_total + 1;
                 pollindex_seq[polln_total] = "SKIP";
-                $("#polllist_ul").append(`<tr class="SKIP"><td class="wp">${polln_total}. ${getWeaponName("SKIP")}</td><td class="cnt cnt_${polln_total}">0</td></tr>`);
+                $("#polllist_ul").append(`<tr class="SKIP"><td class="wp">${polln_total}. ${getWeaponName("SKIP")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
             }
     
             // count set
