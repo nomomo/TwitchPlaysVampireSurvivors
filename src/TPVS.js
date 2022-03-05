@@ -237,7 +237,7 @@ var tpvsLang = {
         "tiePoll":`동점으로 인해 투표가 연장됩니다!`,
         "letsSelectItem":"투표가 종료되었습니다.<br />아이템을 선택하세요!",
         "waitingPoll":"투표 대기 중",
-        "currentmode_strict":"현재 모드는 <strong>트수런 모드</strong> 입니다.<br />- 투표 결과가 강제로 선택되며, 스트리머는 아이템을 직접 선택할 수 없습니다.",
+        "currentmode_strict":"현재 모드는 <strong>트수런 모드</strong> 입니다.<br />투표 결과가 강제로 선택되며, 플레이어는 아이템을 직접 선택할 수 없습니다.",
         "currentmode_soft":"현재 모드는 <strong>훈수 모드</strong> 입니다. 투표는 진행되지만, 결과에 따른 아이템 선택은 스트리머가 직접 진행해야 합니다.",
         "isStrict":"스트리머 아이템 선택 불가(트수런)",
         "isAutoselect":"투표 후 결과 자동 선택",
@@ -317,24 +317,24 @@ document.head.appendChild(script);
 
 const injectionFromTo = [
     [
-        [/(\]\('menu_start'\))/g,"$1,tpvs_startPage()"]
+        [/(\]\('menu_start'\))/,"$1,tpvs_startPage()"]
     ],
     [ 
-        [/(\]\('postGame_header'\))/g,"$1,tpvs_postGame()"]
+        [/(\]\('postGame_header'\))/,"$1,tpvs_postGame()"]
     ],
     [ 
-        [/(\]\('character_header'\))/g,"$1,tpvs_startGame()"]
+        [/(\]\('character_header'\))/,"$1,tpvs_startGame()"]
     ],
     [ 
-        [/(\]\('options_header'\))/g,"$1,tpvs_startPage()"]
+        [/(\]\('options_header'\))/,"$1,tpvs_startPage()"]
     ],
     [ 
-        [/(\['BackFromCharSelectionScene'\]\(\)\{)/g,"$1tpvs_startPage();"],    // for v0.2.13c
-        [/(this\['UI_overlayScene'\].+\(!0x1,this\['CharSelectionScene'\])/g, "tpvs_startPage();$1"]    // for v0.3.0c
+        [/(\['BackFromCharSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();"],    // for v0.2.13c
+        [/(this\['UI_overlayScene'\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(\),this\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(!0x1,this\['CharSelectionScene'\])/, "tpvs_startPage();$1"]    // for v0.3.0c
 
     ],
     [ 
-        [/(\]\('levelup_header'\))/g,"$1,window.tpvs=this,tpvs_startPoll()"]
+        [/(\]\('levelup_header'\))/,"$1,window.tpvs=this,tpvs_startPoll()"]
     ],
 ]
 
@@ -377,6 +377,7 @@ function injectScript(script_ori){
                 var arrayTemp = injectionFromTo[i][canbeinjectedandindexmap[i][1]];
                 var from = arrayTemp[0];
                 var to = arrayTemp[1];
+                NOMO_DEBUG("actual injection from to", from, to, script.match(from));
                 script = script.replace(from,to);
             }
         }
@@ -404,6 +405,7 @@ rawFileMain.onload  = function() {
     //rawFileMainText = rawFileMainText.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':10.03,");
     //rawFileMainText = rawFileMainText.replace("'price':0xc8,'power':0.05,","'price':0xc8,'power':100.05,");
     rawFileMainText = injectScript(rawFileMainText);
+    NOMO_DEBUG(rawFileMainText);
     eval(rawFileMainText);
 };
 rawFileMain.send(null);
@@ -429,9 +431,10 @@ const tpvs_style = /*css*/`
 }
 #welcomesign {
     position: absolute;
+    opacity: 0.3;
     color: #fff;
-    font-size: 1.4vw;
-    top: 1vh;
+    font-size: 1.2vw;
+    top: 0.7vw;
     left: 1vw;
 }
 #modstatus {
@@ -446,6 +449,7 @@ const tpvs_style = /*css*/`
     font-size:1.4vw;
     font-weight:bold;
     padding-bottom: 0.5vw;
+    text-align:center;
 }
 
 #polltimer {
@@ -478,7 +482,7 @@ const tpvs_style = /*css*/`
     border: 0.4vw solid hotpink;
     z-index: 400;
 }
-
+/*
 #pollContainer {
     border-radius: 1vw;
     max-width: 20vw;
@@ -491,12 +495,47 @@ const tpvs_style = /*css*/`
     padding: 1vw;
     box-shadow: rgb(0 0 0 / 30%) 0px 19px 38px, rgb(0 0 0 / 22%) 0px 15px 12px;
 }
-
+*/
+#pollContainer {
+    padding: 0;
+    border: 0.1vw solid #3c1b34;
+    border-radius: 1vw;
+    max-width: 22vw;
+    position: absolute;
+    color: #fff;
+    font-size: 1.2vw;
+    bottom: 10.5vh;
+    right: 8.5vw;
+    background: rgb(75 79 116 / 90%);
+    box-shadow: rgb(0 0 0 / 30%) 0px 19px 38px, rgb(0 0 0 / 22%) 0px 15px 12px;
+}
+#pollContainer_b1 {
+    box-sizing: border-box;
+    border: 0.3vw solid #cc9a4c;
+    width: auto;
+    height: auto;
+    /* pointer-events: none; */
+    margin: 0;
+    padding: 0;
+    border-radius: 1vw;
+}
+#pollContainer_b2 {
+    box-sizing: border-box;
+    border: 0.1vw solid #2c3055;
+    width: auto;
+    height: auto;
+    /* pointer-events: none; */
+    padding: 1vw;
+    border-radius: 0.7vw;
+}
 
 #pollContainer.main {
-    width: 18vw;
+    width: 20vw;
     bottom: 6.5vh;
     right: 6.5vw;
+}
+#pollContainer.smallTBPadding #pollContainer_b2{
+    padding:0.5vw 1vw;
 }
 
 #polllist {
@@ -551,8 +590,9 @@ const tpvs_style = /*css*/`
 }
 
 #twitchChatStatus{
-    font-size: 0.9vw;
-    color: #9146FF;
+    font-size: 1.0vw;
+    /*color: #9146FF;*/
+    color:gold;
     font-weight: bold;
     padding: 0;
     box-sizing: border-box;
@@ -624,7 +664,7 @@ const tpvs_style = /*css*/`
     text-align: right;
 }
 #pageBtnContainer .pageBtn{
-    color:#999;
+    color:#ccc;
     text-align:right;
     cursor:pointer;
 }
@@ -808,11 +848,13 @@ function createLayout(){
         <div id="welcomesign">Twitch Plays Vampire Survivors<br />Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
         <div id="modstatus"></div>
         <div id="pollContainer" style="display:none;">
-        <div id="polltitle" style="display:none;">${getTpvsLang("pickaitem")}</div>
-        <div id="polllist" style="display:none;"><table  cellspacing="0" cellpadding="0" id="polllist_ul"></table></div>
-        <div id="twitchChatStatus">${getTpvsLang("twitchConnecting") + " (" + settings.twitch_user_id + ")"}</div>
-        <div id="tpvs_desc"></div>
-        <div id="polltimer" style="display:none;"></div>
+            <div id="pollContainer_b1"><div id="pollContainer_b2">
+                <div id="polltitle" style="display:none;">${getTpvsLang("pickaitem")}</div>
+                <div id="polllist" style="display:none;"><table  cellspacing="0" cellpadding="0" id="polllist_ul"></table></div>
+                <div id="twitchChatStatus">${getTpvsLang("twitchConnecting") + " (" + settings.twitch_user_id + ")"}</div>
+                <div id="tpvs_desc"></div>
+                <div id="polltimer" style="display:none;"></div>
+            </div></div>
         </div>
     `);
 }
@@ -829,7 +871,7 @@ function setTpvsDesc(html){
 function tpvs_startPoll(restart){
     try{
         NOMO_DEBUG("tpvs_startPoll");
-        $("#pollContainer").removeClass("main");
+        $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
         poll_time = settings.poll_time;
         resetpollcount();
         resetLayout();
@@ -1089,7 +1131,8 @@ function showLastSelectedWeapon(wptp){
     var wpname = getWeaponName(wptp);
     showLayout();
     $("#tpvs_desc").stop(true,true);
-    setTpvsDesc(`<span style="text-shadow: 0px 0px 1vw yellow;">${getTpvsLang("lastSelectedItem")} : ${wpname}</span>`);
+    setTpvsDesc(`<span style="text-shadow: 0px 0px 1vw gold;">${getTpvsLang("lastSelectedItem")} : ${wpname}</span>`);
+    $("#pollContainer").addClass("smallTBPadding");
 }
 
 function tpvs_resumeFromLevelUp(){
@@ -1119,7 +1162,7 @@ function forcefinishpoll(){
         $("#twitchChatStatus").hide();
         $("#welcomesign").hide();
         $("#scriptstatus").hide();
-        $("#pollContainer").removeClass("main");
+        $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
     }
     catch(e){
         NOMO_DEBUG("error from forcefinishpoll", e);
@@ -1163,7 +1206,7 @@ function tpvs_startPage(){
 function tpvs_startGame(){
     try{
         NOMO_DEBUG("START GAME");
-        $("#pollContainer").removeClass("main");
+        $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
         forcefinishpoll();
     }
     catch(e){
@@ -1191,10 +1234,10 @@ function tpvs_postGame(){
 
 function updateTwitchChatStatus(){
     if(twitchChatConnected){
-        $("#twitchChatStatus").html(getTpvsLang("twitchConnected") + " (" + settings.twitch_user_id + ")");
+        $("#twitchChatStatus").html(getTpvsLang("twitchConnected"));
     }
     else{
-        $("#twitchChatStatus").html(getTpvsLang("twitchDisconnected") + " (" + settings.twitch_user_id + ")");
+        $("#twitchChatStatus").html(getTpvsLang("twitchDisconnected"));
     }
 }
 
