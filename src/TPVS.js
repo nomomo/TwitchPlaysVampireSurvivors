@@ -987,8 +987,11 @@ function tpvs_startPoll(polltype){
                     tpvs["OnReroll"] = function(){
                         NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnReroll");
                         forcefinishpoll();
-                        showLastSelectedWeapon("REROLL");
+                        //showLastSelectedWeapon("REROLL");
                         this["OnRerollOri"]();
+
+                        // REROLL 의 경우 강제 투표 재시작
+                        tpvs_startPoll();
                     };
                 }
         
