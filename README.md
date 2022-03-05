@@ -42,15 +42,15 @@
 \steamapps\common\Vampire Survivors\resources\app\.webpack\renderer<br />
 ![copy_files](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/6_install.png)
 
-3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 를 본인 Twitch ID 로 설정하세요.<br />인게임에서도 변경 가능합니다.<br />
+3. 메모장으로 TPVS_Settings.json 파일을 열고 "twitch_user_id" 에 해당하는 값을 본인 Twitch ID 로 설정하세요.<br />아래 그림에서 "pingpink" 라고 적힌 부분을 변경하면 됩니다.<br />인게임의 상세 설정에서도 변경 가능합니다.<br />
 ![set_twitch_id](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/3_settings.png)
 
 4. 준비는 끝! 게임을 실행합니다.
     - 게임 실행 후, 화면 좌측 하단에 "TPVS 모드가 성공적으로 초기화 되었습니다"라는 메시지가 나타났다면 정상적으로 모드가 실행된 것입니다.
-    - 화면 좌측 하단에 대신 "모드 초기화에 실하여 모드가 비활성화 됩니다"라는 메시지가 나타난 경우, 뱀파이어 서바이버의 버전업으로 인하여 모드가 작동하지 않는 상태입니다. 이 경우 제작자 이메일인 nomotg@gmail.com 으로 제보해주세요! (혹은 다른 모드를 설치할 때 main.bundle.js 파일을 덮어씌운 경우 문제가 발생할 수 있습니다.)
+    - 화면 좌측 하단에 "모드 초기화에 실하여 모드가 비활성화 됩니다"라는 메시지가 나타난 경우, 뱀파이어 서바이버의 버전업으로 인하여 모드가 작동하지 않는 상태입니다. 이 경우 제작자 이메일인 nomotg@gmail.com 으로 제보해주세요! (혹은 다른 모드를 설치할 때 main.bundle.js 파일을 덮어씌운 경우 문제가 발생할 수 있습니다.)
     - 모드가 제대로 작동하지 않거나 오류가 발생하는 경우에도 위 이메일로 제보해주세요!
 
-5. 뱀파이버 서바이버가 버전업 되는 경우, 모드 파일 중 index.html 파일만 다시 덮어씌우면 됩니다.
+5. 뱀파이버 서바이버가 버전업 되는 경우, 모드 파일 중 index.html 파일만 다시 덮어씌우면 됩니다.<br />뱀파이어 서바이버 버전업 시에도 모드가 정상 동작할 수도 있고, 그렇지 못할 수도 있습니다. 문제 발생 시 제보해주세요!
 
 ## 모드 제거 방법
 
