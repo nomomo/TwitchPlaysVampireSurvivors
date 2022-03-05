@@ -433,16 +433,22 @@ const tpvs_style = /*css*/`
     position: absolute;
     opacity: 0.3;
     color: #fff;
-    font-size: 1.2vw;
-    top: 0.7vw;
+    font-size: 0.8vw;
+    bottom: 0.7vw;
     left: 1vw;
 }
 #modstatus {
     position: absolute;
-    color: #fff;
-    font-size: 1.0vw;
-    bottom: 1vh;
+    color: #eee;
+    font-size: 0.9vw;
+    bottom: 0.5vw;
     left: 1vw;
+    box-shadow: rgb(0 0 0 / 30%) 0px 19px 38px, rgb(0 0 0 / 22%) 0px 15px 12px;
+    background: rgba(0,0,0,0.8);
+    padding: 0.1vw;
+    min-width: 22vw;
+    border-radius: 0.5vw;
+    letter-spacing: -0.01vw;
 }
 
 #polltitle {
@@ -845,7 +851,7 @@ function resetpollcount(){
 function createLayout(){
     NOMO_DEBUG("createLayout");
     $("body").append(/*html*/`
-        <div id="welcomesign">Twitch Plays Vampire Survivors<br />Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
+        <div id="welcomesign">Twitch Plays Vampire Survivors - Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
         <div id="modstatus"></div>
         <div id="pollContainer" style="display:none;">
             <div id="pollContainer_b1"><div id="pollContainer_b2">
@@ -871,6 +877,7 @@ function setTpvsDesc(html){
 function tpvs_startPoll(restart){
     try{
         NOMO_DEBUG("tpvs_startPoll");
+        $("#welcomesign").stop(true,true).hide();
         $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
         poll_time = settings.poll_time;
         resetpollcount();
@@ -1160,7 +1167,7 @@ function forcefinishpoll(){
         stopTimer();
         ispollstart = false;
         $("#twitchChatStatus").hide();
-        $("#welcomesign").hide();
+        $("#welcomesign").stop(true,true).hide();
         $("#scriptstatus").hide();
         $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
     }
@@ -1193,7 +1200,7 @@ function tpvs_startPage(){
         resetLayout();
         updateTwitchChatStatus();
         $("#welcomesign").fadeIn(500);
-        hideWelcomeSign(3000);
+        //hideWelcomeSign(3000);
         $("#twitchChatStatus").show();
         showCurrentMode();
     }
@@ -1206,6 +1213,7 @@ function tpvs_startPage(){
 function tpvs_startGame(){
     try{
         NOMO_DEBUG("START GAME");
+        $("#welcomesign").stop(true,true).hide();
         $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
         forcefinishpoll();
     }
@@ -1532,7 +1540,7 @@ function twitchPlayInit(){
             setModStatus(getTpvsLang("scriptInitializeSucceed"));
             readJson("TPVS_Settings.json", "settings_temp");
             getLang();
-            hideWelcomeSign(5000);
+            //hideWelcomeSign(10000);
         }
         else{
             $("#welcomesign").hide();
