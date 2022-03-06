@@ -35,6 +35,7 @@ The default installation path for VS is as follows.<br />
 ![copy_files](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/6_install.png)
 
 3. Open the TPVS_Settings.json file with a notepad and set the value for "twitch_user_id" to your Twitch ID.<br />You can also change it in in-game settings panel.<br />
+<br />**If you are not Korean, set "language": "en"**
 ![set_twitch_id](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/3_settings.png)
 
 4. Run the game.
