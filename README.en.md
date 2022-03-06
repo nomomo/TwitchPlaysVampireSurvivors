@@ -45,6 +45,10 @@ The default installation path for VS is as follows.<br />
 
 5. When version of Vampire Survivors is upgraded, you only need to overwrite the index.html file among the mod files.<br />When Vampire Survivors is upgraded, the mod may or may not work properly. Please report any problems!
 
+## Known Bugs
+
+- When returning to the main scene from the character select scene, sometimes the settings panel does not appear. In this case, click the "Options" button to show the settings panel again.
+
 ## How to remove TPVS mod
 
 Just delete the index.html file that was overwritten while installing TPVS mod, or change it to a different name, and rename the index_original.html file to index.html.
