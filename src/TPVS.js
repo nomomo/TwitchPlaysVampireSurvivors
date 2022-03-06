@@ -362,12 +362,10 @@ const injectionFromTo = [
         [/(\]\('character_header'\))/,"$1,tpvs_startGame()"]
     ],
     [ 
-        [/(\]\('options_header'\))/,"$1,tpvs_startPage()"]
-    ],
-    [ 
         [/(\['BackFromCharSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();"],    // for v0.2.13c
         [/(this\['UI_overlayScene'\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(\),this\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(!0x1,this\['CharSelectionScene'\])/, "tpvs_startPage();$1"],    // for v0.3.0c
-        [/\(\){(var [a-zA-Z0-9-_='";,\(\)\[\]!]+!0x1,this\['CharSelectionScene']\))/,"(){tpvs_startPage();$1"]  // for v0.3.0c 220306
+        [/\(\){(var [a-zA-Z0-9-_='";,\(\)\[\]!]+!0x1,this\['CharSelectionScene']\))/,"(){tpvs_startPage();$1"],  // for v0.3.0c 220306
+        [/(\]\('options_header'\))/,"$1,tpvs_startPage()"]  // for backup
     ],
     [ 
         [/(\]\('levelup_header'\))/,"$1,window.tpvs=this,tpvs_startPoll()"]
