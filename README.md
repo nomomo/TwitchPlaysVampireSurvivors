@@ -1,5 +1,8 @@
 # Twitch Plays Vampire Survivors
 
+[![ko](https://img.shields.io/badge/lang-ko--kr-green.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.en.md)
+
 ## _뱀파이어 서바이버 시청자 참여 모드_
 
 혹시 노업 하이퍼 유령런, 사신런을 **정복**하셨나요?<br />
@@ -31,7 +34,7 @@
 
 ## 모드 설치 방법
 
-본 모드는 22년 3월 4일 오후 11시 기준 뱀파이어 서바이버 v0.3.0c 정식 버전에서 작동됩니다.
+본 모드는 22년 3월 6일 오후 1시 기준 뱀파이어 서바이버 v0.3.0c 정식 버전에서 작동됩니다.
 
 1. 아래 링크로 접속해 "Lastest"로 표시된 최신 버전의 모드 압축 파일을 다운로드 받습니다.
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
@@ -66,6 +69,7 @@
 
 ## Change log
 
+- v0.0.7 (2022-03-06): 22년 3월 6일자 v0.3.0c 버전에 호환되도록 수정
 - v0.0.6 (2022-03-05): 유제품 공장 맵에서 무기 발견 시 획득하기 & 버리기에 대한 투표 기능 추가
 - v0.0.5 (2022-03-05): 메인 화면으로 돌아왔을 때 인포 패널이 다시 보이지 않는 버그 수정 및 패널 디자인 수정
 - v0.0.4 (2022-03-04): v0.3.0c 버전에 호환되도록 수정

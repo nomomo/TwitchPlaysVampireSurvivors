@@ -4,6 +4,7 @@
 /// - nomotg@gmail.com
 /// - https://nomo.asia
 ////////////////////////////////////////////////////////////////////
+var TPVS_Version = "v0.0.7";
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
@@ -290,8 +291,8 @@ var tpvsLang = {
         "playSoundEffect":"효과음 재생",
         "detailSettings":"상세 설정",
         "back":"뒤로",
-        "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다.",
-        "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. 뱀서가 업데이트 된 경우 개발자에게 연락하여 패치를 요청해주세요!"
+        "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다. "+TPVS_Version,
+        "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. "+TPVS_Version+". 뱀서가 업데이트 된 경우 개발자에게 연락하여 패치를 요청해주세요!"
     },
     "en":{
         "twitchConnecting":"Connecting with the Twitch chat.",
@@ -302,16 +303,16 @@ var tpvsLang = {
         "tiePoll":"Polls are running again due to a tie!",
         "letsSelectItem":"Poll completed. Select an item!",
         "waitingPoll":"Waiting to poll",
-        "currentmode_strict":"Current mode: Strict<br />- Item will be automatically selected by poll result, and streamer cannot directly select item.",
-        "currentmode_soft":"Current mode: Soft<br />- The streamer proceeds to select an item according to the poll result.",
+        "currentmode_strict":"Current mode: STRICT<br />Item will be automatically selected by poll result, and streamer cannot directly select item.",
+        "currentmode_soft":"Current mode: SOFT<br />The streamer proceeds to select an item according to the poll result.",
         "isStrict":"Use Strict Mode",
         "isAutoselect":"Auto-select item after poll",
         "connect":"Connect",
         "pollTime":"Poll time(s)",
         "pollRestartTme":"Poll time in case of tie(s)",
         "pollResultShowTme":"Poll result display time(s)",
-        "isSkipGoldcoinAndChicken":"Skip poll for gold coins and chicken",
-        "hidePollDuringPoll":"Hide the number of votes during a poll",
+        "isSkipGoldcoinAndChicken":"Skip poll for coins and roast",
+        "hidePollDuringPoll":"Hide the number of votes",
         "waitingAutoResultSelectDelay":`After a while, the item will be selected automatically`,
         "gameOver":"The game is over.<br />Wait for the next game",
         "totalcount":"Total votes",
@@ -320,8 +321,8 @@ var tpvsLang = {
         "playSoundEffect":"Play sound effect",
         "detailSettings":"More options",
         "back":"Back",
-        "scriptInitializeSucceed":"The mod has been successfully initialized.",
-        "scriptInitializeFailed":"TPVS Mod initialization failed. The mode is disabled. Contact the developer for more details!"
+        "scriptInitializeSucceed":"TPVS mod has been successfully initialized. "+TPVS_Version,
+        "scriptInitializeFailed":"TPVS Mod initialization failed. "+TPVS_Version+". TPVS mod is disabled. Contact the developer for more details!"
     }
 }
 
@@ -365,8 +366,8 @@ const injectionFromTo = [
     ],
     [ 
         [/(\['BackFromCharSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();"],    // for v0.2.13c
-        [/(this\['UI_overlayScene'\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(\),this\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(!0x1,this\['CharSelectionScene'\])/, "tpvs_startPage();$1"]    // for v0.3.0c
-
+        [/(this\['UI_overlayScene'\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(\),this\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\[[a-zA-Z0-9-_'"]+\([a-zA-Z0-9-_'"]+\)\]\(!0x1,this\['CharSelectionScene'\])/, "tpvs_startPage();$1"],    // for v0.3.0c
+        [/\(\){(var [a-zA-Z0-9-_='";,\(\)\[\]!]+!0x1,this\['CharSelectionScene']\))/,"(){tpvs_startPage();$1"]  // for v0.3.0c 220306
     ],
     [ 
         [/(\]\('levelup_header'\))/,"$1,window.tpvs=this,tpvs_startPoll()"]
@@ -494,7 +495,7 @@ const tpvs_style = /*css*/`
     box-shadow: rgb(0 0 0 / 30%) 0px 19px 38px, rgb(0 0 0 / 22%) 0px 15px 12px;
     background: rgba(0,0,0,0.8);
     padding: 0.1vw;
-    min-width: 22vw;
+    min-width: 30vw;
     border-radius: 0.5vw;
     letter-spacing: -0.01vw;
 }
@@ -910,7 +911,7 @@ function resetpollcount(){
 function createLayout(){
     NOMO_DEBUG("createLayout");
     $("body").append(/*html*/`
-        <div id="welcomesign">Twitch Plays Vampire Survivors - Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
+        <div id="welcomesign">Twitch Plays Vampire Survivors ${TPVS_Version} - Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
         <div id="modstatus"></div>
         <div id="pollContainer" style="display:none;">
             <div id="pollContainer_b1"><div id="pollContainer_b2">
