@@ -895,7 +895,7 @@ function onMessageHandler (target, context, msg, self) {
             if(msg.length > 0){
                 msg = msg[0];
             }
-            if($.isNumeric(msg)){
+            if($.isNumeric(msg) && ispollstart){
                 countpoll(id,dn,Number(msg));
             }
         }
@@ -963,7 +963,9 @@ function countpoll(id, dn, result){
         // 이미 투표한 경우
         if(polldata[id] !== undefined){
             pollcount[polldata[id].v] = pollcount[polldata[id].v] - 1;
-            polldata[id] = {"v":result,"c":true};
+            if(polldata[id].v !== result){
+                polldata[id] = {"v":result,"c":true};
+            }
         }
         else{
             pollcount_total = pollcount_total + 1;
