@@ -1278,6 +1278,7 @@ function checkPollEnd(){
         NOMO_DEBUG("sortable", JSON.stringify(sortable));
 
         if(settings.prevent_streamer_select && settings.use_roulette && sortable.length >= 2){
+            ispollstart = false;
             updateCount(true);
             var wpid = sortable[0][0];
             var wptype = pollindex_seq[wpid];
@@ -1311,6 +1312,7 @@ function checkPollEnd(){
                 restartpoll();
             }
             else{
+                ispollstart = false;
                 updateCount(true);
                 setTpvsDesc(`<div style="text-align:center;">${getTpvsLang("letsSelectItem")}</div>`);
                 playPollEndSound();
