@@ -936,6 +936,9 @@ function onDisconnectedHandler (reason) {
 // Poll System
 var polldata = {};
 
+var pollorder_userid = {}; // poll-order : user-id
+var pollorder_cnt = 0;
+
 var ispollstart = false;    // poll 시작 여부
 var poll_time = 0.0;
 var poll_time_startdate = new Date();
@@ -964,15 +967,28 @@ function countpoll(id, dn, result){
         if(polldata[id] !== undefined){
             pollcount[polldata[id].v] = pollcount[polldata[id].v] - 1;
             if(polldata[id].v !== result){
-                polldata[id] = {"v":result,"c":true};
+
+                // to reduce memory cost
+                if(pollorder_cnt < 100){
+                    delete pollorder_userid[polldata[id].o];
+                    pollorder_userid[pollorder_cnt] = id;
+                }
+
+                polldata[id] = {"v":result,"c":true,"o":pollorder_cnt};
             }
         }
         else{
             pollcount_total = pollcount_total + 1;
-            polldata[id] = {"v":result,"c":false};
+            polldata[id] = {"v":result,"c":false,"o":pollorder_cnt};
+            
+            // to reduce memory cost
+            if(pollorder_cnt < 100){
+                pollorder_userid[pollorder_cnt] = id;
+            }
         }
         
         pollcount[result] = pollcount[result] + 1;
+        pollorder_cnt = pollorder_cnt + 1;
     }
     catch(e){
         NOMO_DEBUG("error from countpoll", e);
@@ -989,6 +1005,9 @@ function resetpollcount(){
 
     polldata = null;    // GC
     polldata = {};  // user-id : poll target
+    
+    pollorder_userid = {}; // poll-order : user-id
+    pollorder_cnt = 0;
 
     pollindex_seq = {};
 
@@ -1436,12 +1455,13 @@ function showLastSelectedWeapon(wptp){
             NOMO_DEBUG("wpid: ", wpid);
             if(wpid !== -1){
                 var firstvoteid, firstvotedn, firstvotefound = false;
-                for (var key in polldata){
-                    NOMO_DEBUG("polldata[key]", polldata[key]);
-                    if(polldata[key].v === wpid && !polldata[key].c){
+                var pollorder_userid_length = Object.keys(pollorder_userid).length;
+                for (var i=0; i<pollorder_userid_length; i++){
+                    NOMO_DEBUG("pollorder_userid[i]", pollorder_userid[i]);
+                    if(pollorder_userid[i] !== undefined){
                         firstvotefound = true;
-                        firstvoteid = key;
-                        firstvotedn = userid_dn_map[key];
+                        firstvoteid = pollorder_userid[i];
+                        firstvotedn = userid_dn_map[firstvoteid];
                         break;
                     }
                 }
@@ -1544,14 +1564,54 @@ function tpvs_startGame(){
 }
 
 // Post game page
-var ddikkubemote = ["(*≧▽≦)", "✧٩(ˊωˋ*)و✧", "҉ ٩(๑>ω<๑)۶҉", "(✌’ω’)✌", "(´･∀･`)", "（⌒▽⌒ゞ", "🤭", "🙃", " ⎛⎝⎛♥‿♥⎞⎠⎞ ", "(=^･ω･^=)", " ʅ（´◔౪◔）ʃ "];
+var ddikkubemote = ["(*≧▽≦)", "✧٩(ˊωˋ*)و✧", "҉ ٩(๑>ω<๑)۶҉", "(✌’ω’)✌", "(´･∀･`)", "（⌒▽⌒ゞ", "🤭", "🙃", " ⎛⎝⎛♥‿♥⎞⎠⎞ ", "(=^･ω･^=)", " ʅ（´◔౪◔）ʃ ","(*/ω＼*)","༼ つ ◕_◕ ༽つ","(╯°□°）╯︵ ┻┻","( ´･･)ﾉ(._.`)","¯\_(ツ)_/¯","🥴","🤣","😏"];
 function tpvs_postGame(){
     try{
         NOMO_DEBUG("POST GAME");
         resetpollcount();
         resetLayout();
         var randomEmoji = ddikkubemote[Math.floor(Math.random() * ddikkubemote.length)];
-        setTpvsDesc(getTpvsLang("gameOver") + " " + randomEmoji);
+        if(isKRElectionEvent && settings.prevent_streamer_select){
+            var randno = Math.floor(Math.random() * 50);
+            switch (randno) {
+                default:
+                    setTpvsDesc(getTpvsLang("gameOver") + " " + randomEmoji);
+                    break;
+                case 0:
+                    setTpvsDesc("포인트가 많으나 적으나 모두가 똑같은 한표 입니다!<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 1:
+                    setTpvsDesc("투표가 답이다!<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 2:
+                    setTpvsDesc("나는 오망성에 투표한다.<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 3:
+                    setTpvsDesc("세 개의 심장으로 피차게 달린다!<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 4:
+                    setTpvsDesc("일등트수는 일찍일찍 투표해요!<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 5:
+                    setTpvsDesc("투표하면 내 포인트가 바뀝니다!<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 6:
+                    setTpvsDesc("투표는 민주주의의 꽃!<br />역배로 일확천금 달성하자!" + " " + randomEmoji);
+                    break;
+                case 7:
+                    setTpvsDesc("아이템 주권은 트수, 소중한 한 표!<br />다음 게임을 기다립니다." + " " + randomEmoji);
+                    break;
+                case 8:
+                    setTpvsDesc("???:너가 투표를 잘 했으면 된거 아닌가?<br />" + " " + randomEmoji);
+                    break;
+                case 9:
+                    setTpvsDesc("붉은심장 vs. 까만심장 vs. 내심장<br />" + " " + randomEmoji);
+                    break;
+            }
+        }
+        else{
+            setTpvsDesc(getTpvsLang("gameOver") + " " + randomEmoji);
+        }
         $("#twitchChatStatus").hide();
         showLayout();
     }
