@@ -14,11 +14,11 @@ var settings_init = {
 
     poll_time : 15,
     poll_restart_time : 5,
-    auto_result_select_delay_time:5,
+    auto_result_select_delay_time: 3,
     poll_result_hide: false,
 
     prevent_streamer_select : true,
-    use_roulette : true,
+    use_roulette : false,
     auto_result_select : false,
 
     skip_poll_for_goldcoins_and_chicken : true,
