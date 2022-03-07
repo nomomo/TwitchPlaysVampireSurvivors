@@ -24,6 +24,8 @@ var settings_init = {
     skip_poll_for_goldcoins_and_chicken : true,
 
     subonly : false,
+
+    panel_left : false,
     
     play_sound_effect : true,
     language:"ko"
@@ -315,6 +317,7 @@ var tpvsLang = {
         "roulette":"룰렛",
         "subonlypoll":"구독자 전용 투표",
         "playSoundEffect":"효과음 재생",
+        "panel_left":"TPVS 패널을 왼쪽으로 이동",
         "detailSettings":"상세 설정",
         "back":"뒤로",
         "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다. "+TPVS_Version,
@@ -349,6 +352,7 @@ var tpvsLang = {
         "roulette":"ITEM",
         "subonlypoll":"Subscriber only poll",
         "playSoundEffect":"Play sound effect",
+        "panel_left":"move TPVS panel to the left",
         "detailSettings":"More options",
         "back":"Back",
         "scriptInitializeSucceed":"TPVS mod has been successfully initialized. "+TPVS_Version,
@@ -536,6 +540,7 @@ const tpvs_style = /*css*/`
     user-select: none;
     font-family:'Noto Sans KR', sans-serif;
 }
+
 #welcomesign {
     position: absolute;
     opacity: 0.3;
@@ -631,6 +636,11 @@ const tpvs_style = /*css*/`
     background: rgb(75 79 116 / 90%);
     box-shadow: rgb(0 0 0 / 30%) 0px 19px 38px, rgb(0 0 0 / 22%) 0px 15px 12px;
 }
+
+#pollContainer.panel_left {
+    left: 8.5vw;
+    right: unset;
+}
 #pollContainer_b1 {
     box-sizing: border-box;
     border: 0.3vw solid #cc9a4c;
@@ -655,6 +665,10 @@ const tpvs_style = /*css*/`
     width: 20vw;
     bottom: 6.5vh;
     right: 6.5vw;
+}
+#pollContainer.panel_left.main {
+    left: 6.5vw;
+    right: unset;
 }
 #pollContainer.smallTBPadding #pollContainer_b2{
     padding: 0.3vw 0.6vw;
@@ -988,7 +1002,7 @@ function createLayout(){
     $("body").append(/*html*/`
         <div id="welcomesign">Twitch Plays Vampire Survivors ${TPVS_Version} - Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
         <div id="modstatus"></div>
-        <div id="pollContainer" style="display:none;">
+        <div id="pollContainer" style="display:none;" class="${settings.panel_left ? "panel_left" : ""}">
             <div id="pollContainer_b1"><div id="pollContainer_b2">
                 <div id="polltitle" style="display:none;">${getTpvsLang("pickaitem")}</div>
                 <div id="polllist" style="display:none;"><table id="polllist_ul"></table></div>
@@ -1582,6 +1596,8 @@ function showCurrentMode(pageNo){
                     <label id="checkbox_skip_poll_for_goldcoins_and_chicken_container">${getTpvsLang("isSkipGoldcoinAndChicken")} <input type="checkbox" setting="skip_poll_for_goldcoins_and_chicken" /></label>
                     <label id="checkbox_subonly_container">${getTpvsLang("subonlypoll")} <input type="checkbox" setting="subonly" /></label>
                     <label id="checkbox_play_sound_effect_container">${getTpvsLang("playSoundEffect")} <input type="checkbox" setting="play_sound_effect" /></label>
+                    
+                    <label id="checkbox_panel_left_container">${getTpvsLang("panel_left")} <input type="checkbox" setting="panel_left" /></label>
                     <div id="pageBtnContainer">
                         <span id="goto2ndpage" class="pageBtn">${getTpvsLang("detailSettings")} ></span>
                         <span id="backto1stpage" class="pageBtn">< ${getTpvsLang("back")}</span>
@@ -1621,6 +1637,14 @@ function showCurrentMode(pageNo){
                         $startGUI.find("#modeDisc").html(getTpvsLang("currentmode_soft"));
                         $startGUI.find("#checkbox_auto_result_select_container").show();
                         $startGUI.find("#checkbox_use_roulette_container").hide();
+                    }
+                }
+                else if(settingName == "panel_left"){
+                    if(settingVal){
+                        $("#pollContainer").addClass("panel_left");
+                    }
+                    else{
+                        $("#pollContainer").removeClass("panel_left");
                     }
                 }
                 writeSettingJson();
@@ -1670,7 +1694,8 @@ function showCurrentMode(pageNo){
                 "#pollRestartTme_Container",
                 "#pollResultShowTme_Container",
                 "#checkbox_play_sound_effect_container",
-                "#backto1stpage"
+                "#backto1stpage",
+                "#checkbox_panel_left_container"
             ]
         ];
 
