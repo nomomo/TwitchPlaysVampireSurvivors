@@ -61,16 +61,6 @@ var DEBUG_PANEL_ON = false;
 var DEBUG_PANEL_SETTIMEOUT;
 if(DEBUG_PANEL_ON){
     $("body").append(`<div id="debugPanel" style="overflow:hidden;background-color:rgba(255,255,255,0.5);color:#000;font-size:12px;width:30vw;height:100vh;position:absolute;top:0;left:0;"></div>`);
-    setTimeout(function(){
-        try{
-            var app = require('app');
-            app.commandLine.appendSwitch('remote-debugging-port', '8315');
-            app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
-        }
-        catch(e){
-            NOMO_DEBUG(e);
-        }
-    },1000);
 }
 window.NOMO_DEBUG = function (/**/){
     if(DEBUG){
@@ -329,7 +319,8 @@ var tpvsLang = {
         "back":"뒤로",
         "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다. "+TPVS_Version,
         "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. "+TPVS_Version+". 뱀서가 업데이트 된 경우 개발자에게 연락하여 패치를 요청해주세요!",
-        "spinRoulette":"투표율에 따라 룰렛을 돌립니다!"
+        "spinRoulette":"투표율에 따라 룰렛을 돌립니다!",
+        "firstVoteChat":"{0} 님이 가장 먼저 투표했어요!"
     },
     "en":{
         "twitchConnecting":"Connecting with the Twitch chat.",
@@ -362,7 +353,8 @@ var tpvsLang = {
         "back":"Back",
         "scriptInitializeSucceed":"TPVS mod has been successfully initialized. "+TPVS_Version,
         "scriptInitializeFailed":"TPVS Mod initialization failed. "+TPVS_Version+". TPVS mod is disabled. Contact the developer for more details!",
-        "spinRoulette":"Roulette is spinning!"
+        "spinRoulette":"Roulette is spinning!",
+        "firstVoteChat":"{0} was the first to vote!"
     }
 }
 
@@ -373,6 +365,12 @@ if (!String.prototype.format) {
             return typeof args[number] != 'undefined' ? args[number] : match;
         });
     };
+    String.prototype.aryFormat = function(_array){
+        var args = _array;
+        return this.replace(/{(\d+)}/g, function(match, number) {
+            return typeof args[number] != 'undefined' ? args[number] : match;
+        });
+    }
 }
 function getTpvsLang(/**/){
     try{    
@@ -386,12 +384,12 @@ function getTpvsLang(/**/){
             }
         }
         else{
-            var formatargs = args.slice(1, arguments.length);
+            var formatargs = Array.from(arguments).slice(1, arguments.length);
             if(settings.language == "ko"){
-                return tpvsLang.ko[key].format.apply(this, formatargs);
+                return tpvsLang.ko[key].aryFormat(formatargs);
             }
             else {
-                return tpvsLang.en[key].format.apply(this, formatargs);;
+                return tpvsLang.en[key].aryFormat(formatargs);
             }
         }
     }
@@ -659,7 +657,8 @@ const tpvs_style = /*css*/`
     right: 6.5vw;
 }
 #pollContainer.smallTBPadding #pollContainer_b2{
-    padding:0.5vw 1vw;
+    padding: 0.3vw 0.6vw;
+    max-width: 20vw;
 }
 
 #polllist {
@@ -812,6 +811,7 @@ $("head").append(`<style>${tpvs_style}</style>`);
 
 ////////////////////////////////////////////////////////////////////
 // Twitch Chat
+var userid_dn_map = {};
 var twitchChatConnected = false;
 // Define configuration options
 var client;
@@ -870,6 +870,7 @@ function onMessageHandler (target, context, msg, self) {
         if (settings.subonly && !context.subscriber){ return; } // subonly poll option
         if (ispollstart){
             var id = context["user-id"];
+            var dn = context["display-name"];
             var msg = msg.trim().toLowerCase();
             
             msg = msg
@@ -881,7 +882,7 @@ function onMessageHandler (target, context, msg, self) {
                 msg = msg[0];
             }
             if($.isNumeric(msg)){
-                countpoll(id,Number(msg));
+                countpoll(id,dn,Number(msg));
             }
         }
     }
@@ -892,13 +893,15 @@ function onMessageHandler (target, context, msg, self) {
 
 if(DEBUG_CREATE_RANDOM_CHAT){
     var id = 0;
+    var dn = "";
     var randno = [1,2,2,1,1,1,1,1,2,3,4,4,4,3,1,2,2,2,3,4,5];
     setInterval(function(){
         id = id + 1;
         if(id>100000) id = 0;
+        dn = "disp_"+id;
         var msg = randno[Math.floor(Math.random() * randno.length)];
-        countpoll(id,Number(msg));
-    },5);
+        countpoll(id,dn,Number(msg));
+    },500);
 }
 
 function onConnectedHandler (addr, port) {
@@ -934,8 +937,10 @@ var polltext = [];
 var polltext_lang = [];
 
 
-function countpoll(id, result){
+function countpoll(id, dn, result){
     try{
+        userid_dn_map[id] = dn;
+
         //NOMO_DEBUG("countpoll", id, result);
         if(result > polln_total || result < 1){
             return;
@@ -943,14 +948,15 @@ function countpoll(id, result){
 
         // 이미 투표한 경우
         if(polldata[id] !== undefined){
-            pollcount[polldata[id]] = pollcount[polldata[id]] - 1;
+            pollcount[polldata[id].v] = pollcount[polldata[id].v] - 1;
+            polldata[id] = {"v":result,"c":true};
         }
         else{
             pollcount_total = pollcount_total + 1;
+            polldata[id] = {"v":result,"c":false};
         }
-
+        
         pollcount[result] = pollcount[result] + 1;
-        polldata[id] = result;
     }
     catch(e){
         NOMO_DEBUG("error from countpoll", e);
@@ -1398,9 +1404,44 @@ function showLastSelectedWeapon(wptp){
         NOMO_DEBUG("error from showlastselectedweapon", e);
     }
 
+    // find first vote
+    var firstvotetext = "";
+    try{
+        if(pollcount_total !== 0){
+            var wpid = -1;
+            for(var key in pollindex_seq){
+                if(pollindex_seq[key] === wptp){
+                    wpid = Number(key);
+                    break;
+                }
+            }
+            NOMO_DEBUG("wpid: ", wpid);
+            if(wpid !== -1){
+                var firstvoteid, firstvotedn, firstvotefound = false;
+                for (var key in polldata){
+                    NOMO_DEBUG("polldata[key]", polldata[key]);
+                    if(polldata[key].v === wpid && !polldata[key].c){
+                        firstvotefound = true;
+                        firstvoteid = key;
+                        firstvotedn = userid_dn_map[key];
+                        break;
+                    }
+                }
+    
+                NOMO_DEBUG("firstvotefound: ", firstvotefound);
+                if(firstvotefound && firstvotedn !== undefined && firstvotedn !== ""){
+                    firstvotetext += `<div style="font-size:0.8vw;word-break:break-all;font-weight:100;letter-spacing:-0.01vw;">${getTpvsLang("firstVoteChat", firstvotedn)}</span>`;
+                }
+            }
+        }
+    }
+    catch(e){
+        NOMO_DEBUG("ERROR FROM FIRSTVOTEFOUND", e);
+    }
+
     showLayout();
     $("#tpvs_desc").stop(true,true);
-    setTpvsDesc(`<span style="text-shadow: 0px 0px 1vw gold;">${selectedType} : ${wpname}</span>`);
+    setTpvsDesc(`<div style="text-shadow: 0px 0px 1vw gold;">${selectedType} : ${wpname}${firstvotetext}</div>`);
     $("#pollContainer").addClass("smallTBPadding");
 }
 
@@ -1457,7 +1498,7 @@ function restartpoll(){
 // 시작 페이지 도달
 function tpvs_startPage(){
     try{
-        $("#pollContainer").addClass("main");
+        $("#pollContainer").addClass("main").removeClass("smallTBPadding");;
         showLayout();
         resetLayout();
         updateTwitchChatStatus();
