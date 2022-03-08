@@ -5,7 +5,7 @@
 /// - https://nomo.asia
 
 ////////////////////////////////////////////////////////////////////
-var TPVS_Version = "v0.0.8";
+var TPVS_Version = "v0.0.9";
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
@@ -1001,17 +1001,24 @@ function resetpollcount(){
     polln_total = 0;
 
     pollcount_total = 0;
+
+    pollcount = null;    // GC
     pollcount = {};
 
     polldata = null;    // GC
     polldata = {};  // user-id : poll target
     
+    pollorder_userid = null;    // GC
     pollorder_userid = {}; // poll-order : user-id
     pollorder_cnt = 0;
 
+    pollindex_seq = null;    // GC
     pollindex_seq = {};
 
+    polltext = null;    // GC
     polltext = [];
+
+    polltext_lang = null;    // GC
     polltext_lang = [];
 }
 
@@ -1458,11 +1465,13 @@ function showLastSelectedWeapon(wptp){
                 var pollorder_userid_length = Object.keys(pollorder_userid).length;
                 for (var i=0; i<pollorder_userid_length; i++){
                     NOMO_DEBUG("pollorder_userid[i]", pollorder_userid[i]);
-                    if(pollorder_userid[i] !== undefined){
-                        firstvotefound = true;
+                    if(pollorder_userid[i] !== undefined && pollorder_userid[i] !== null){
                         firstvoteid = pollorder_userid[i];
-                        firstvotedn = userid_dn_map[firstvoteid];
-                        break;
+                        if(!polldata[firstvoteid].c && polldata[firstvoteid].v == wpid){
+                            firstvotefound = true;
+                            firstvotedn = userid_dn_map[firstvoteid];
+                            break;
+                        }
                     }
                 }
     
