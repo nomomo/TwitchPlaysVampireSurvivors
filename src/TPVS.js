@@ -5,7 +5,7 @@
 /// - https://nomo.asia
 
 ////////////////////////////////////////////////////////////////////
-var TPVS_Version = "v0.0.9";
+var TPVS_Version = "v0.1.0";
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
@@ -114,6 +114,7 @@ function checkKREvent(){
 const keyEvent = ["keydown", "keypress", "keyup"];
 const mouseClickEvent = ["mousedown", "mouseup", "touchstart",  "touchend", "click"];
 var allowUserInput = true;
+var forceAllowUserInput = false;
 function eventcatch(a, b, c){
     if (keyEvent.includes(a)) {
         //NOMO_DEBUG("key event catch", a/*, b, c*/);
@@ -133,7 +134,7 @@ function eventcatch(a, b, c){
 
     var newfunction = function(){
         if(keyEvent.includes(a) || mouseClickEvent.includes(a)){
-            if(allowUserInput){
+            if(forceAllowUserInput || allowUserInput){
                 b.apply(this, arguments);
             }
         }
@@ -155,6 +156,32 @@ document["_addEventListener_" + date_n] = document.addEventListener;
 document.addEventListener = eventcatch;
 Element.prototype["_addEventListener_" + date_n] = Element.prototype.addEventListener;
 Element.prototype.addEventListener = eventcatch;
+
+
+// // Press Enter 5 times --> allow user input
+// // before override keydown event, add event
+// var forceAllowUserInputTimeout;
+// var forceAllowUserInputCounter = 0;
+// var test = function(e) {
+//     NOMO_DEBUG("keypress", e);
+//     if(ispollstart && e.which == 13) {
+//         NOMO_DEBUG("ENTER KEY TYPED. COUNTER = ", forceAllowUserInputCounter);
+//         clearTimeout(forceAllowUserInputTimeout);
+//         forceAllowUserInputCounter += 1;
+//         setTimeout(function(){
+//             if(forceAllowUserInputCounter >= 5){
+//                 forceAllowUserInput = true;
+//                 NOMO_DEBUG("forceAllowUserInput CHANGED", forceAllowUserInput);
+//                 if(!settings.skip_poll_for_goldcoins_and_chicken){
+//                     setTpvsDesc(getTpvsLang("pollDisableForChickenAndGold"));
+//                 }
+//                 settings.skip_poll_for_goldcoins_and_chicken = true;
+//                 forceAllowUserInputCounter = 0;
+//             }
+//         },300);
+//     }
+// }
+// document["_addEventListener_" + date_n]('keydown', test);
 
 
 ////////////////////////////////////////////////////////////////////
@@ -323,7 +350,11 @@ var tpvsLang = {
         "scriptInitializeSucceed":"TPVS 모드가 성공적으로 초기화 되었습니다. "+TPVS_Version,
         "scriptInitializeFailed":"TPVS 모드 초기화에 실패하여 모드가 비활성화 됩니다. "+TPVS_Version+". 뱀서가 업데이트 된 경우 개발자에게 연락하여 패치를 요청해주세요!",
         "spinRoulette":"투표율에 따라 룰렛을 돌립니다!",
-        "firstVoteChat":"{0} 님이 가장 먼저 투표했어요!"
+        "firstVoteChat":"{0} 님이 가장 먼저 투표했어요!",
+        "onlyOneItemLeft":"남은 아이템이 하나이므로 투표 없이 자동으로 선택됩니다.",
+        "pollDisableForChickenAndGold":"다음 레벨업 부터 치킨, 골드에 대한 투표가 비활성화 됩니다.",
+        "enterFiveTimesToDisable":"치킨, 골드에 대한 투표를 비활성화하려면 엔터를 빠르게 다섯번 누르세요!",
+        "nowYouCanUseKeyboard":"치킨, 골드에 대한 투표 시 빠른 진행을 위해 아이템을 직접 선택할 수 있습니다."
     },
     "en":{
         "twitchConnecting":"Connecting with the Twitch chat.",
@@ -358,7 +389,10 @@ var tpvsLang = {
         "scriptInitializeSucceed":"TPVS mod has been successfully initialized. "+TPVS_Version,
         "scriptInitializeFailed":"TPVS Mod initialization failed. "+TPVS_Version+". TPVS mod is disabled. Contact the developer for more details!",
         "spinRoulette":"Roulette is spinning!",
-        "firstVoteChat":"{0} was the first to vote!"
+        "firstVoteChat":"{0} was the first to vote!",
+        "pollDisableForChickenAndGold":"Poll for gold and roast will be disabled from next level up!",
+        "enterFiveTimesToDisable":"To disable poll for gold and roast, press Enter key five times!",
+        "nowYouCanUseKeyboard":"Now you can select gold and roast by yourself."
     }
 }
 
@@ -512,7 +546,8 @@ rawFileMain.onload  = function() {
     // rawFileMainText = rawFileMainText.replace("'price':0xc8,'power':0.05,","'price':0xc8,'power':100.05,");
     // rawFileMainText = rawFileMainText.replace("'price':0xc8,'greed':0.1,","'price':0xc8,'greed':100.1,");
     // rawFileMainText = rawFileMainText.replace("'price':0x12c,'moveSpeed':0.05,","'price':0x12c,'moveSpeed':10.1,");
-    // rawFileMainText = rawFileMainText.replace(/(const [a-zA-Z0-9-_'"]+=)(!0x1)(,[a-zA-Z0-9-_'"]+=[a-zA-Z0-9-_'"]+,[a-zA-Z0-9-_'"]+=!0x1,[a-zA-Z0-9-_'"]+='v0\.3\.0c - EA')/,"$1!0x0$3");
+    // rawFileMainText = rawFileMainText.replace(/(const [a-zA-Z0-9-_'"]+=)(!0x1)(,_[a-zA-Z0-9-_'"]+=)(!0x1)(,_[a-zA-Z0-9-_'"]+=!0x1,_[a-zA-Z0-9-_'"]+='v\d\.\d\.\d[a-zA-Z]? - EA')/, "$1!0x0$3!0x0$5");
+    // rawFileMainText = rawFileMainText.replace(/(const [a-zA-Z0-9-_'"]+=)(!0x1)(,[a-zA-Z0-9-_'"]+=[a-zA-Z0-9-_'"]+,[a-zA-Z0-9-_'"]+=!0x1,[a-zA-Z0-9-_'"]+='v\d\.\d\.\d[a-zA-Z]? - EA')/,"$1!0x0$3");
     rawFileMainText = injectScript(rawFileMainText);
 
     rawFileMainText = rawFileMainText.replace(/(\['BackFromStageSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();");
@@ -632,13 +667,13 @@ const tpvs_style = /*css*/`
     color: #fff;
     font-size: 1.2vw;
     bottom: 10.5vh;
-    right: 8.5vw;
+    right: max(calc(1.5vh / 5 * 8 + (100vw - 100vh / 5 * 8) / 2),5vw);/*8.5vw*/
     background: rgb(75 79 116 / 90%);
     box-shadow: rgb(0 0 0 / 30%) 0px 19px 38px, rgb(0 0 0 / 22%) 0px 15px 12px;
 }
 
 #pollContainer.panel_left {
-    left: 8.5vw;
+    left: max(calc(1.5vh / 5 * 8 + (100vw - 100vh / 5 * 8) / 2),5vw);/*8.5vw*/
     right: unset;
 }
 #pollContainer_b1 {
@@ -910,12 +945,14 @@ if(DEBUG_CREATE_RANDOM_CHAT){
     var dn = "";
     var randno = [1,2,2,1,1,1,1,1,2,3,4,4,4,3,1,2,2,2,3,4,5];
     setInterval(function(){
-        id = id + 1;
-        if(id>100000) id = 0;
-        dn = "disp_"+id;
-        var msg = randno[Math.floor(Math.random() * randno.length)];
-        countpoll(id,dn,Number(msg));
-    },500);
+        if(ispollstart){
+            id = id + 1;
+            if(id>100000) id = 0;
+            dn = "disp_"+id;
+            var msg = randno[Math.floor(Math.random() * randno.length)];
+            countpoll(id,dn,Number(msg));
+        }
+    },50);
 }
 
 function onConnectedHandler (addr, port) {
@@ -1037,6 +1074,7 @@ function createLayout(){
                 <div id="twitchChatStatus">${getTpvsLang("twitchConnecting") + " (" + settings.twitch_user_id + ")"}</div>
                 <div id="tpvs_desc"></div>
                 <div id="polltimer" style="display:none;"></div>
+                <div id="pollDisableForChicken" style="display:none;">POLL DISABLE</div>
             </div></div>
         </div>
     `);
@@ -1048,6 +1086,15 @@ function setModStatus(html){
 
 function setTpvsDesc(html){
     $("#tpvs_desc").html(html).stop(true,true).fadeIn(500);
+}
+
+function togglePollDisableForChicken(cond){
+    if(cond && !settings.skip_poll_for_goldcoins_and_chicken) {
+        $("#pollDisableForChicken").show();
+    }
+    else{
+        $("#pollDisableForChicken").hide();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1198,6 +1245,31 @@ function tpvs_startPoll(polltype){
                 }
             }
 
+            // 투표 항목이 하나만 존재할 경우 스킵
+            if((settings.prevent_streamer_select || settings.auto_result_select) && polln_total == 1){
+                NOMO_DEBUG("투표 항목이 하나만 존재, 총 아이템 개수: " , polln_total);
+                toggleUserInput(true);
+                ispollstart = false;
+    
+                togglePollLayout(true);
+                showLayout();
+
+                highlightitem(1);
+                stopTimer();
+                
+                playPollEndSound();
+                poll_time_startdate = new Date();
+                poll_time = settings.auto_result_select_delay_time;
+                updatePureTimer();
+
+                setTimeout(function(){
+                    selectWeapon(polltext[0]);
+                },settings.auto_result_select_delay_time * 1000);
+
+                setTpvsDesc(getTpvsLang("onlyOneItemLeft"));
+                return;
+            }
+
             if(polltype == 1){
                 var wptype = "NEWITEM_DISCARD";
                 polln_total = polln_total + 1;
@@ -1223,10 +1295,18 @@ function tpvs_startPoll(polltype){
             }
     
             // 모든 것이 아이템일 경우 스킵함
-            if(polltype == 0 && IS_ITEMS && settings.skip_poll_for_goldcoins_and_chicken){
-                NOMO_DEBUG("투표하지 않음, 총 아이템 개수: " , polln_total);
-                forcefinishpoll();
-                return;
+            if(polltype == 0 && IS_ITEMS){
+                if(settings.skip_poll_for_goldcoins_and_chicken){
+                    NOMO_DEBUG("투표하지 않음, 총 아이템 개수: " , polln_total);
+                    forcefinishpoll();
+                    return;
+                }
+                else{
+                    // 안내 메시지 생성!!
+                    // togglePollDisableForChicken(true);
+                    toggleUserInput(true);
+                    setTpvsDesc(getTpvsLang("nowYouCanUseKeyboard"));
+                }
             }
             NOMO_DEBUG("polltext",polltext,"IS_ITEMS",IS_ITEMS,"skip_poll_for_goldcoins_and_chicken",settings.skip_poll_for_goldcoins_and_chicken)
     
@@ -1433,8 +1513,10 @@ function showLastSelectedWeapon(wptp){
                 NOMO_DEBUG("key", key, pollcount);
                 if(pollcount_total !== 0 && pollindex_seq[key] === wptp){
                     var per = pollcount[key] / pollcount_total * 100.0;
-                    perText = ` (${per.toFixed(1)}%)`;
-                    wpname = wpname + perText;
+                    if(!isNaN(per)){
+                        perText = ` (${per.toFixed(1)}%)`;
+                        wpname = wpname + perText;
+                    }
                     break;
                 }
             }
@@ -1520,6 +1602,8 @@ function forcefinishpoll(){
         $("#welcomesign").stop(true,true).hide();
         $("#scriptstatus").hide();
         $("#pollContainer").removeClass("main").removeClass("smallTBPadding");
+        stopRoulette = true;
+        //togglePollDisableForChicken(false);
     }
     catch(e){
         NOMO_DEBUG("error from forcefinishpoll", e);
@@ -1553,6 +1637,7 @@ function tpvs_startPage(){
         //hideWelcomeSign(3000);
         $("#twitchChatStatus").show();
         showCurrentMode();
+        forceAllowUserInput = false;
     }
     catch(e){
         NOMO_DEBUG("error from tpvs_startPage", e);
@@ -1623,6 +1708,7 @@ function tpvs_postGame(){
         }
         $("#twitchChatStatus").hide();
         showLayout();
+        forceAllowUserInput = false;
     }
     catch(e){
         NOMO_DEBUG("error from tpvs_postGame", e);
@@ -1804,8 +1890,10 @@ function showCurrentMode(pageNo){
 
 /////////////////////////
 // 아이템 하이라이트
+var stopRoulette = false;
 function rouletteHighlight(wpind){
     try{
+        stopRoulette = false;
         setTpvsDesc(getTpvsLang("spinRoulette"));
 
         var maxLastIter = 5;
@@ -1842,6 +1930,12 @@ function rouletteHighlight(wpind){
         
         // loop
         var se = function(){
+            if(stopRoulette){
+                stopRoulette = false;
+                playDrumRollSound(false);
+                return;
+            }
+
             // finish
             if(rcount >= round_n){
                 // random delay at the end

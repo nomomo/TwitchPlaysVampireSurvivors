@@ -10,7 +10,7 @@
 
     "auto_result_select" : false,
     "poll_result_hide" : false,
-    "skip_poll_for_goldcoins_and_chicken" : false,
+    "skip_poll_for_goldcoins_and_chicken" : true,
     "subonly" : false,
     
     "panel_left" : false,
