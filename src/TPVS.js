@@ -5,7 +5,7 @@
 /// - https://nomo.asia
 
 ////////////////////////////////////////////////////////////////////
-var TPVS_Version = "v0.1.0";
+var TPVS_Version = "v0.1.1";
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
@@ -1245,8 +1245,8 @@ function tpvs_startPoll(polltype){
                 }
             }
 
-            // 투표 항목이 하나만 존재할 경우 스킵
-            if((settings.prevent_streamer_select || settings.auto_result_select) && polln_total == 1){
+            // polltype == 0 일 때 투표 항목이 하나만 존재할 경우 스킵
+            if(polltype == 0 && (settings.prevent_streamer_select || settings.auto_result_select) && polln_total == 1){
                 NOMO_DEBUG("투표 항목이 하나만 존재, 총 아이템 개수: " , polln_total);
                 toggleUserInput(true);
                 ispollstart = false;
