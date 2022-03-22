@@ -83,7 +83,7 @@
 
 - 투표 진행 시간 변경: !TPVS SetTime 숫자(초). 예) !TPVS SetTime 10
 - 투표 종료 후 결과 보여주는 시간 변경: !TPVS SetEndTime 숫자(초). 예) !TPVS SetEndTime 5
-- 다음 커맨드를 입력한 판에 한하여, 투표 중 스트리머 입력을 금지하지 않음: !TPVS unlock
+- 다음 커맨드를 입력한 판에 한하여, 투표 중 스트리머의 키보드 및 마우스 조작을 금지하지 않음: !TPVS unlock
 
 ### 그 외 몰라도 좋은 커맨드
 
