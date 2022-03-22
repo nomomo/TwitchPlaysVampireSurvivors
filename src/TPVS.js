@@ -5,16 +5,16 @@
 /// - https://nomo.asia
 
 ////////////////////////////////////////////////////////////////////
-var TPVS_Version = "v0.1.1";
+var TPVS_Version = "v0.1.2";
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
 var settings_init = {
     twitch_user_id : "pingpink",
 
-    poll_time : 15,
-    poll_restart_time : 5,
-    auto_result_select_delay_time: 3,
+    poll_time : 9,
+    poll_restart_time : 4,
+    auto_result_select_delay_time: 2,
     poll_result_hide: false,
 
     prevent_streamer_select : true,
@@ -354,7 +354,8 @@ var tpvsLang = {
         "onlyOneItemLeft":"남은 아이템이 하나이므로 투표 없이 자동으로 선택됩니다.",
         "pollDisableForChickenAndGold":"다음 레벨업 부터 치킨, 골드에 대한 투표가 비활성화 됩니다.",
         "enterFiveTimesToDisable":"치킨, 골드에 대한 투표를 비활성화하려면 엔터를 빠르게 다섯번 누르세요!",
-        "nowYouCanUseKeyboard":"치킨, 골드에 대한 투표 시 빠른 진행을 위해 아이템을 직접 선택할 수 있습니다."
+        "nowYouCanUseKeyboard":"치킨, 골드에 대한 투표 시 빠른 진행을 위해 아이템을 직접 선택할 수 있습니다.",
+        "tpvscmdsduringpoll":"오류 방지를 위해 투표 중에는 커맨드를 사용할 수 없습니다."
     },
     "en":{
         "twitchConnecting":"Connecting with the Twitch chat.",
@@ -392,7 +393,8 @@ var tpvsLang = {
         "firstVoteChat":"{0} was the first to vote!",
         "pollDisableForChickenAndGold":"Poll for gold and roast will be disabled from next level up!",
         "enterFiveTimesToDisable":"To disable poll for gold and roast, press Enter key five times!",
-        "nowYouCanUseKeyboard":"Now you can select gold and roast by yourself."
+        "nowYouCanUseKeyboard":"Now you can select gold and roast by yourself.",
+        "tpvscmdsduringpoll":"TPVS COMMANDS CAN NOT BE USED DURING VOTING TO AVOID UNKNOWN ERRORS"
     }
 }
 
@@ -571,14 +573,22 @@ rawFileMain.send(null);
 */
 const tpvs_style = /*css*/`
 @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
-#pollContainer, #welcomesign, #modstatus {
+#pollContainer, #welcomesign, #modstatus, #cmd {
     user-select: none;
     font-family:'Noto Sans KR', sans-serif;
 }
 
+#cmd {
+    position: absolute;
+    opacity: 1;
+    color: #fff;
+    font-size: 0.8vw;
+    top: 0.7vw;
+    left: 1vw;
+}
 #welcomesign {
     position: absolute;
-    opacity: 0.3;
+    opacity: 0.5;
     color: #fff;
     font-size: 0.8vw;
     bottom: 0.7vw;
@@ -910,11 +920,38 @@ function TwitchChatReconnect(){
     }
 }
 
+/*
+badge-info: null
+badge-info-raw: null
+badges: null
+badges-raw: null
+client-nonce: "hash"
+color: "#8A2BE2"
+display-name: "디스플레이네임"
+emotes: null
+emotes-raw: null
+first-msg: false
+flags: null
+id: "12341234-1234-1234-99dd-39ba0d53d5a8"
+message-type: "chat"
+mod: false
+room-id: "185398814"
+subscriber: false
+tmi-sent-ts: "1647961385785"
+turbo: false
+user-id: "123412344"
+user-type: null
+username: "pingpink"
+*/
 
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
     try{
         NOMO_DEBUG("[chat]",context.username,context["display-name"],msg)
+        // cmd msg
+        if(context.username.toLowerCase() === settings.twitch_user_id.toLowerCase() && msg.length > 0 && msg[0] === "!"){
+            runCMD(msg);
+        }
         if (self) { return; } // Ignore messages from the bot
         if (settings.subonly && !context.subscriber){ return; } // subonly poll option
         if (ispollstart){
@@ -925,7 +962,7 @@ function onMessageHandler (target, context, msg, self) {
             msg = msg
                 .replace("!","")
                 .replace("투표","")
-                .replace("/\s/g","")
+                .replace(/\s/g,"")
                 .trim();
             if(msg.length > 0){
                 msg = msg[0];
@@ -937,6 +974,145 @@ function onMessageHandler (target, context, msg, self) {
     }
     catch(e){
         NOMO_DEBUG("error from onMessageHandler", e);
+    }
+}
+
+function runCMD(cmd){
+    try{
+        NOMO_DEBUG("runCMD", cmd);
+        var cmd_new = cmd.toLowerCase().trim();
+        if(cmd_new.indexOf("!tpvs ") === -1){
+            return;
+        }
+        if(ispollstart){
+            setCmdStatud(getTpvsLang("tpvscmdsduringpoll"));
+            return;
+        }
+    
+        cmd_new = cmd_new.replace("!tpvs ","").replace(/\s\s/g," ").trim();
+        var cmds = cmd_new.split(" ");
+        if(cmds.length > 2){
+            return;
+        }
+        var cmd_text = cmds[0];
+        var cmd_contents = undefined;
+        if(cmds.length > 1) {
+            cmd_contents = cmds[1];
+        }
+        NOMO_DEBUG("runCMD cmds", cmds);
+    
+        switch(cmd_text){
+            default:
+                setCmdStatud("UNKNOWN COMMAND : " + cmd.replace("!tpvs ",""));
+                break;
+            case "settime":
+            case "poll_time":
+                if($.isNumeric(cmd_contents)){
+                    cmd_contents = Number(cmd_contents);
+                    settings.poll_time = cmd_contents;
+                    writeSettingJson();
+                    setCmdStatud("POLL TIME = " + settings.poll_time);
+                }
+                else{
+                    setCmdStatud("POLL TIME MUST BE NUMERIC VALUE");
+                }
+                break;
+            case "setrestarttime":
+            case "poll_restart_time":
+                if($.isNumeric(cmd_contents)){
+                    cmd_contents = Number(cmd_contents);
+                    settings.poll_restart_time = cmd_contents;
+                    writeSettingJson();
+                    setCmdStatud("POLL RESTART TIME = " + settings.poll_restart_time);
+                }
+                else{
+                    setCmdStatud("POLL RESTART MUST BE NUMERIC VALUE.");
+                }
+                break;
+            case "setendtime":
+            case "auto_result_select_delay_time":
+                if($.isNumeric(cmd_contents)){
+                    cmd_contents = Number(cmd_contents);
+                    settings.auto_result_select_delay_time = cmd_contents;
+                    writeSettingJson();
+                    setCmdStatud("POLL END DELAY TIME = " + settings.auto_result_select_delay_time);
+                }
+                else{
+                    setCmdStatud("POLL END DELAY TIME MUST BE NUMERIC VALUE.");
+                }
+                break;
+            case "unlock":
+                forceAllowUserInput = true;
+                setCmdStatud("ALL USER INPUT IS ALLOWED FOR THIS GAME.");
+                break;
+            case "lock":
+                forceAllowUserInput = false;
+                setCmdStatud("ALLOW USER INPUT IS CANCELED.");
+                break;
+            case "showresult":
+                if (cmd_contents === "on"){
+                    settings.poll_result_hide = false;
+                    setCmdStatud("SHOW POLL RESULTS.");
+                    writeSettingJson();
+                }
+                else if(cmd_contents === "off"){
+                    settings.poll_result_hide = false;
+                    setCmdStatud("HIDE POLL RESULTS.");
+                    writeSettingJson();
+                }
+                else{
+                    setCmdStatud("VALUE MUST BE 'ON' OR 'OFF'. INPUT VALUE = " + cmd_contents);
+                }
+                break;
+            case "subonly":
+                if (cmd_contents === "on"){
+                    settings.subonly = true;
+                    setCmdStatud("SUBONLY = ON");
+                    writeSettingJson();
+                }
+                else if(cmd_contents === "off"){
+                    settings.subonly = false;
+                    setCmdStatud("SUBONLY = FALSE");
+                    writeSettingJson();
+                }
+                else{
+                    setCmdStatud("VALUE MUST BE 'ON' OR 'OFF'. INPUT VALUE = " + cmd_contents);
+                }
+                break;
+            case "skipchicken":
+                if (cmd_contents === "on"){
+                    settings.skip_poll_for_goldcoins_and_chicken = true;
+                    setCmdStatud("skip_poll_for_goldcoins_and_chicken = ON");
+                    writeSettingJson();
+                }
+                else if(cmd_contents === "off"){
+                    settings.skip_poll_for_goldcoins_and_chicken = false;
+                    setCmdStatud("skip_poll_for_goldcoins_and_chicken = FALSE");
+                    writeSettingJson();
+                }
+                else{
+                    setCmdStatud("VALUE MUST BE 'ON' OR 'OFF'. INPUT VALUE = " + cmd_contents);
+                }
+                break;
+            case "sfx":
+                if (cmd_contents === "on"){
+                    settings.play_sound_effect = true;
+                    setCmdStatud("PLAY SOUND EFFECT = ON");
+                    writeSettingJson();
+                }
+                else if(cmd_contents === "off"){
+                    settings.play_sound_effect = false;
+                    setCmdStatud("PLAY SOUND EFFECT = FALSE");
+                    writeSettingJson();
+                }
+                else{
+                    setCmdStatud("VALUE MUST BE 'ON' OR 'OFF'. INPUT VALUE = " + cmd_contents);
+                }
+                break;
+        }
+    }
+    catch(e){
+        NOMO_DEBUG("error from runCMD", e);
     }
 }
 
@@ -1067,6 +1243,7 @@ function createLayout(){
     $("body").append(/*html*/`
         <div id="welcomesign">Twitch Plays Vampire Survivors ${TPVS_Version} - Mod by NOMO & <span style="color:hotpink">@핑크요정</span></div>
         <div id="modstatus"></div>
+        <div id="cmd" style="display:none;"></div>
         <div id="pollContainer" style="display:none;" class="${settings.panel_left ? "panel_left" : ""}">
             <div id="pollContainer_b1"><div id="pollContainer_b2">
                 <div id="polltitle" style="display:none;">${getTpvsLang("pickaitem")}</div>
@@ -1078,6 +1255,10 @@ function createLayout(){
             </div></div>
         </div>
     `);
+}
+
+function setCmdStatud(html){
+    $("#cmd").html(html).stop(true,true).fadeIn(100).delay(5000).fadeOut(100);
 }
 
 function setModStatus(html){
@@ -1262,7 +1443,7 @@ function tpvs_startPoll(polltype){
                 poll_time = settings.auto_result_select_delay_time;
                 updatePureTimer();
 
-                setTimeout(function(){
+                setTimeout_selectWeapon = setTimeout(function(){
                     selectWeapon(polltext[0]);
                 },settings.auto_result_select_delay_time * 1000);
 
@@ -1458,7 +1639,7 @@ function checkPollEnd(){
                 poll_time = settings.auto_result_select_delay_time;
                 updatePureTimer();
 
-                setTimeout(function(){
+                setTimeout_selectWeapon = setTimeout(function(){
                     selectWeapon(wptype);
                 },settings.auto_result_select_delay_time * 1000);
             }
@@ -1475,6 +1656,7 @@ function checkPollEnd(){
     }
 }
 
+var setTimeout_selectWeapon = undefined;
 function selectWeapon(wptype){
     NOMO_DEBUG("selectWeapon(wptype)");
     forcefinishpoll();
@@ -1590,6 +1772,7 @@ function finishPollWithPostTime(){
 // 강제로 투표 끝내기
 function forcefinishpoll(){
     try{
+        clearTimeout(setTimeout_selectWeapon);
         hideLayout();
         //resetpollcount();
         resetLayout();
@@ -1665,8 +1848,8 @@ function tpvs_postGame(){
         resetpollcount();
         resetLayout();
         var randomEmoji = ddikkubemote[Math.floor(Math.random() * ddikkubemote.length)];
-        if(isKRElectionEvent && settings.prevent_streamer_select){
-            var randno = Math.floor(Math.random() * 50);
+        if(/*isKRElectionEvent && */settings.language === "ko" && settings.prevent_streamer_select){
+            var randno = Math.floor(Math.random() * 100);
             switch (randno) {
                 default:
                     setTpvsDesc(getTpvsLang("gameOver") + " " + randomEmoji);
@@ -1697,9 +1880,6 @@ function tpvs_postGame(){
                     break;
                 case 8:
                     setTpvsDesc("???:너가 투표를 잘 했으면 된거 아닌가?<br />" + " " + randomEmoji);
-                    break;
-                case 9:
-                    setTpvsDesc("붉은심장 vs. 까만심장 vs. 내심장<br />" + " " + randomEmoji);
                     break;
             }
         }
@@ -1973,7 +2153,7 @@ function rouletteHighlight(wpind){
                     updatePureTimer();
     
                     // select weapon
-                    setTimeout(function(){
+                    setTimeout_selectWeapon = setTimeout(function(){
                         selectWeapon(wptype);
                     },settings.auto_result_select_delay_time * 1000);
                 }, directFinish * (randLastDelay + 70.0 * randomLastIter + Math.random() * Math.max(0.0, 1000.0 - 100.0 * randomLastIter)));

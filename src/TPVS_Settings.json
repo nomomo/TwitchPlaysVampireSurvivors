@@ -1,9 +1,9 @@
 {
     "twitch_user_id" : "pingpink",
 
-    "poll_time" : 15,
-    "poll_restart_time" : 5,
-    "auto_result_select_delay_time" : 3,
+    "poll_time" : 9,
+    "poll_restart_time" : 4,
+    "auto_result_select_delay_time" : 2,
 
     "prevent_streamer_select" : true,
     "use_roulette": false,
