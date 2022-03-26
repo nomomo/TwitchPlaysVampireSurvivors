@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////
 // version
-var TPVS_Version = "v0.1.2";
+var TPVS_Version = "v0.1.3";
 function findNewVersion(){
     try{
         fetch("https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/package.json")
@@ -332,6 +332,9 @@ function getWeaponName(wptype, lang){
         else if(wptypetuc === "SKIP"){
             return Lang[mylang]["translations"]["levelup_skip"];
         }
+        else if(wptypetuc === "BANISH"){
+            return Lang[mylang]["translations"]["levelup_banish"];
+        }
         else if(wptypetuc == "NEWITEM_GET"){
             return Lang[mylang]["translations"]["newItem_get"];
         }
@@ -582,8 +585,7 @@ rawFileMain.onload  = function() {
     // rawFileMainText = rawFileMainText.replace("'price':0xc8,'power':0.05,","'price':0xc8,'power':100.05,");
     // rawFileMainText = rawFileMainText.replace("'price':0xc8,'greed':0.1,","'price':0xc8,'greed':100.1,");
     // rawFileMainText = rawFileMainText.replace("'price':0x12c,'moveSpeed':0.05,","'price':0x12c,'moveSpeed':10.1,");
-    // rawFileMainText = rawFileMainText.replace(/(const [a-zA-Z0-9-_'"]+=)(!0x1)(,_[a-zA-Z0-9-_'"]+=)(!0x1)(,_[a-zA-Z0-9-_'"]+=!0x1,_[a-zA-Z0-9-_'"]+='v\d\.\d\.\d[a-zA-Z]? - EA')/, "$1!0x0$3!0x0$5");
-    // rawFileMainText = rawFileMainText.replace(/(const [a-zA-Z0-9-_'"]+=)(!0x1)(,[a-zA-Z0-9-_'"]+=[a-zA-Z0-9-_'"]+,[a-zA-Z0-9-_'"]+=!0x1,[a-zA-Z0-9-_'"]+='v\d\.\d\.\d[a-zA-Z]? - EA')/,"$1!0x0$3");
+    // rawFileMainText = rawFileMainText.replace("const _0x1f2c2c=!0x1,_0x2f7f63=_0x1f2c2c,_0xd475d6=!0x1,_0x2c0488=0x143,_0x4d7454='v0.3.2c - EA'", "const _0x1f2c2c=!0x0,_0x2f7f63=_0x1f2c2c,_0xd475d6=!0x1,_0x2c0488=0x143,_0x4d7454='v0.3.2c - EA'");
     rawFileMainText = injectScript(rawFileMainText);
 
     rawFileMainText = rawFileMainText.replace(/(\['BackFromStageSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();");
@@ -1314,8 +1316,9 @@ function togglePollDisableForChicken(cond){
 
 ////////////////////////////////////////////////////////////////////
 // polltype: 0=level up, 1=find weapon
-var lastSelectedItem = "";
-function tpvs_startPoll(polltype){
+var lastSelectedItem = "";  // only used to find weapon
+var isBanish = false;       // true when banish is selected by poll or user
+function tpvs_startPoll(polltype, banish){
     try{
         NOMO_DEBUG("tpvs_startPoll");
         $("#welcomesign").stop(true,true).hide();
@@ -1323,6 +1326,14 @@ function tpvs_startPoll(polltype){
 
         if(polltype === undefined){
             polltype = 0;   // level up
+        }
+
+        if(banish === undefined){
+            banish = 0;
+        }
+
+        if(banish === 0){
+            isBanish = false;
         }
 
         poll_time = settings.poll_time;
@@ -1383,6 +1394,48 @@ function tpvs_startPoll(polltype){
                         forcefinishpoll();
                         showLastSelectedWeapon("SKIP");
                         this["OnSkipOri"]();
+                    };
+                }
+
+                if(tpvs["OnBanishOri"] === undefined && tpvs["OnBanish"] !== undefined){
+                    NOMO_DEBUG("OVERRIDE FUNCTION: OnBanish");
+                    tpvs["OnBanishOri"] = tpvs["OnBanish"];
+                    tpvs["OnBanish"] = function(){
+                        NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnBanish");
+                        forcefinishpoll();
+                        showLastSelectedWeapon("BANISH");
+                        this["OnBanishOri"]();
+
+                        // BANISH 의 경우 강제 투표 재시작
+                        isBanish = true;
+                        tpvs_startPoll(0, 1);
+                    };
+                }
+
+                if(tpvs["OnCancelBanishOri"] === undefined && tpvs["OnCancelBanish"] !== undefined){
+                    NOMO_DEBUG("OVERRIDE FUNCTION: OnCancelBanish");
+                    tpvs["OnCancelBanishOri"] = tpvs["OnCancelBanish"];
+                    tpvs["OnCancelBanish"] = function(){
+                        isBanish = false;
+                        NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnCancelBanish");
+                        forcefinishpoll();
+                        //showLastSelectedWeapon(item, "BANISH_CONFIRM");
+                        this["OnCancelBanishOri"]();
+
+                        // OnCancelBanishOri 의 경우 강제 투표 재시작
+                        tpvs_startPoll(0, 0);
+                    };
+                }
+                
+                if(tpvs["OnConfirmBanishOri"] === undefined && tpvs["OnConfirmBanish"] !== undefined){
+                    NOMO_DEBUG("OVERRIDE FUNCTION: OnConfirmBanish");
+                    tpvs["OnConfirmBanishOri"] = tpvs["OnConfirmBanish"];
+                    tpvs["OnConfirmBanish"] = function(item){
+                        isBanish = false;
+                        NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnConfirmBanish");
+                        forcefinishpoll();
+                        showLastSelectedWeapon(item, "BANISH_CONFIRM");
+                        this["OnConfirmBanishOri"](item);
                     };
                 }
             }
@@ -1551,15 +1604,22 @@ function tpvs_startPoll(polltype){
     
             updateTimer(checkPollEnd);
     
-            if(polltype == 0 && tpvs.HasRerolls){
-                polln_total = polln_total + 1;
-                pollindex_seq[polln_total] = "REROLL";
-                $("#polllist_ul").append(`<tr class="REROLL"><td class="wp">${polln_total}. ${getWeaponName("REROLL")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
-            }
-            if(polltype == 0 && tpvs.HasSkips){
-                polln_total = polln_total + 1;
-                pollindex_seq[polln_total] = "SKIP";
-                $("#polllist_ul").append(`<tr class="SKIP"><td class="wp">${polln_total}. ${getWeaponName("SKIP")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
+            if(polltype == 0 && banish == 0){
+                if(tpvs.HasRerolls){
+                    polln_total = polln_total + 1;
+                    pollindex_seq[polln_total] = "REROLL";
+                    $("#polllist_ul").append(`<tr class="REROLL"><td class="wp">${polln_total}. ${getWeaponName("REROLL")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
+                }
+                if(tpvs.HasSkips){
+                    polln_total = polln_total + 1;
+                    pollindex_seq[polln_total] = "SKIP";
+                    $("#polllist_ul").append(`<tr class="SKIP"><td class="wp">${polln_total}. ${getWeaponName("SKIP")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
+                }
+                if(tpvs.HasBanish){
+                    polln_total = polln_total + 1;
+                    pollindex_seq[polln_total] = "BANISH";
+                    $("#polllist_ul").append(`<tr class="BANISH"><td class="wp">${polln_total}. ${getWeaponName("BANISH")}<div class="wpbg wpbg_${polln_total}" style="width:0%"></div><div class="cnt cnt_${polln_total}">0</div></td></tr>`);
+                }
             }
     
             // count set
@@ -1694,11 +1754,18 @@ var setTimeout_selectWeapon = undefined;
 function selectWeapon(wptype){
     NOMO_DEBUG("selectWeapon(wptype)");
     forcefinishpoll();
-    if(wptype === "REROLL") {
+
+    if(isBanish){
+        tpvs['OnConfirmBanish'](wptype);
+    }
+    else if(wptype === "REROLL") {
         tpvs['OnReroll']();
     }
     else if(wptype === "SKIP"){
         tpvs['OnSkip']();
+    }
+    else if(wptype === "BANISH"){
+        tpvs['OnBanish']();
     }
     else if(wptype === "NEWITEM_GET"){
         tpvs_newItem['OnButtonClicked']();
@@ -1714,12 +1781,15 @@ function selectWeapon(wptype){
     }
 }
 
-function showLastSelectedWeapon(wptp){
+function showLastSelectedWeapon(wptp, eventType){
     var wpname = getWeaponName(wptp);
     var selectedType = getTpvsLang("lastSelectedItem");
 
     if(wptp == "NEWITEM_GET" || wptp == "NEWITEM_DISCARD"){
         wpname = `${wpname} (${getWeaponName(lastSelectedItem)})`;
+    }
+    else if(eventType !== undefined && eventType === "BANISH_CONFIRM"){
+        wpname = `${wpname} (${getWeaponName("BANISH")})`;
     }
 
     try{

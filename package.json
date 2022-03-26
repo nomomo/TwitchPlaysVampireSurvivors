@@ -1,6 +1,6 @@
 {
   "name": "twitchplaysvampiresurvivors",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Twitch Chat Poll Mod for Vampire Survivors on Steam",
   "main": "src/TPVS.js",
   "repository": {
