@@ -5,7 +5,41 @@
 /// - https://nomo.asia
 
 ////////////////////////////////////////////////////////////////////
+// version
 var TPVS_Version = "v0.1.2";
+function findNewVersion(){
+    try{
+        fetch("https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/package.json")
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(myJson) {
+                var newVer = myJson.version;
+                var oldVerAry = TPVS_Version.replace("v","").split(".");
+                var newVerAry = newVer.split(".");
+
+                var foundNewVer = false;
+                for(var i=0;i<oldVerAry.length;i++){
+                    if(oldVerAry[i] > newVerAry[i]){
+                        break;
+                    }
+                    else if(oldVerAry[i] < newVerAry[i]){
+                        foundNewVer = true;
+                        break;
+                    }
+                }
+
+                if(foundNewVer){
+                    $("#cmd").html(`New TPVS version exists! Update to v${newVer}.<br />https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases`)
+                    .stop(true,true).fadeIn(100).delay(60000).fadeOut(100);
+                }
+
+            });
+    }
+    catch(e){
+        NOMO_DEBUG("fail to fetch version", e);
+    }
+}
 
 ////////////////////////////////////////////////////////////////////
 /// User Settings
@@ -2342,6 +2376,7 @@ function twitchPlayInit(){
             $("#welcomesign").hide();
             setModStatus(getTpvsLang("scriptInitializeFailed"));
         }
+        findNewVersion();
     
         setTimeout(function(){
             $("#modstatus").fadeOut(500);
