@@ -1403,7 +1403,7 @@ function tpvs_startPoll(polltype, banish){
                     tpvs["OnBanish"] = function(){
                         NOMO_DEBUG("OVERRIDED FUNCTION CALL: OnBanish");
                         forcefinishpoll();
-                        showLastSelectedWeapon("BANISH");
+                        //showLastSelectedWeapon("BANISH");
                         this["OnBanishOri"]();
 
                         // BANISH 의 경우 강제 투표 재시작
