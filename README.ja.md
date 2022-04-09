@@ -1,7 +1,6 @@
 # Twitch Plays Vampire Survivors - Chat Poll Mod
 
-**Google translated**
-厄介な部分がある場合は、情報提供または貢献してください。 or use English version.
+**Google翻訳を使用して翻訳されています。** 厄介な部分がある場合は、情報提供または貢献してください。 or use English version.
 
 [![ko](https://img.shields.io/badge/lang-ko--kr-green.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.md)
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.en.md)
