@@ -1,6 +1,7 @@
 ## 뱀파이어 서바이버즈 시청자 참여 모드 TPVS
 
-**▼ Multi-language support (Google translated)**<br />
+**▼ Multi-language support (Google translated) ▼**
+
 [![ko](https://img.shields.io/badge/lang-ko--kr-green.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.md)
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.en.md)
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.ja.md)
