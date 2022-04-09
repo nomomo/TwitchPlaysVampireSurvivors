@@ -59,7 +59,7 @@ var settings_init = {
 
     subonly : false,
 
-    panel_left : false,
+    panel_left : true,
     
     play_sound_effect : true,
     language:"ko"
@@ -291,6 +291,8 @@ function readJson(filename, varname){
                         settings[settingsKey] = settings_temp[settingsKey];
                     }
                 }
+
+                $("body").addClass(settings.language);
                 createLayout();
                 TwitchChatConnect();
                 loadSoundFiles();
@@ -394,6 +396,46 @@ var tpvsLang = {
         "nowYouCanUseKeyboard":"치킨, 골드에 대한 투표 시 빠른 진행을 위해 아이템을 직접 선택할 수 있습니다.",
         "tpvscmdsduringpoll":"오류 방지를 위해 투표 중에는 커맨드를 사용할 수 없습니다."
     },
+    "ja":{
+        "twitchConnecting":"Connecting with the Twitch chat.",
+        "twitchConnected":"Connected to Twitch chat.",
+        "twitchDisconnected":"Failed to connect to Twitch chat.",
+        "pickaitem":"アイテムを選択してください！",
+        "letsPoll":"番号をチャットウィンドウに入力します。<br />例: !1 or 22 or 3333333",
+        "tiePoll":"同点で投票が延長される！",
+        "letsSelectItem":"投票終了！アイテムを選択してください！",
+        "waitingPoll":"投票待機中",
+        "currentmode_strict":"現在のモードは<strong>厳格モード</strong>です。投票結果は 強制的に選択され、プレイヤーはアイテムを 直接選択できません。",
+        "currentmode_soft":"現在のモードは<strong>ソフトモード</strong>です。投票は進行中ですが、結果に応じたアイテムの 選択はストリーマーが 直接行う必要があります。",
+        "isStrict":"アイテム選択不可",
+        "isAutoselect":"投票後の結果の自動選択",
+        "isuse_roulette":"投票率ベースのランダム選択",
+        "connect":"接続",
+        "pollTime":"投票時間(s)",
+        "pollRestartTme":"再投票時間(s)",
+        "pollResultShowTme":"投票結果表示時間(s)",
+        "isSkipGoldcoinAndChicken":"ゴールドとチキンに投票しない",
+        "hidePollDuringPoll":"投票進行状況を隠す",
+        "waitingAutoResultSelectDelay": "アイテムが自動的に選択されます。",
+        "gameOver":"ゲームが終了しました。<br />次のゲームを待ちます",
+        "totalcount":"総投票数",
+        "lastSelectedItem":"選択",
+        "roulette":"ルーレット",
+        "subonlypoll":"加入者専用投票",
+        "playSoundEffect":"効果音再生",
+        "panel_left":"TPVS パネルを左に移動",
+        "detailSettings":"詳細設定",
+        "back":"戻る",
+        "scriptInitializeSucceed":"TPVS モードが正常に初期化されました。"+TPVS_Version,
+        "scriptInitializeFailed":"TPVS モードの初期化に失敗してモードが無効になります。"+TPVS_Version+". ゲームが更新された場合は、開発者に連絡してパッチをリクエストしてください。",
+        "spinRoulette":"投票率に応じてルーレットを回します！",
+        "firstVoteChat":"{0} が最初に投票しました！",
+        "onlyOneItemLeft":"残りのアイテムが 1 つなので、投票なしで自動的に選択されます。",
+        "pollDisableForChickenAndGold":"次のレベルアップからチキン、ゴールドへの投票が無効になります。",
+        "enterFiveTimesToDisable":"チキン、ゴールドへの投票を無効にするには、エンターをすばやく5回押してください！",
+        "nowYouCanUseKeyboard":"チキン、ゴールドへの投票時に迅速な進行のためにアイテムを直接選択することができます。",
+        "tpvscmdsduringpoll":"エラーを防止するため、投票中はコマンドを使用できません。"
+    },
     "en":{
         "twitchConnecting":"Connecting with the Twitch chat.",
         "twitchConnected":"Connected to Twitch chat.",
@@ -414,7 +456,7 @@ var tpvsLang = {
         "pollResultShowTme":"Poll result display time(s)",
         "isSkipGoldcoinAndChicken":"Skip poll for coins and roast",
         "hidePollDuringPoll":"Hide the number of votes",
-        "waitingAutoResultSelectDelay":`After a while, the item will be selected automatically`,
+        "waitingAutoResultSelectDelay":`Item will be selected automatically`,
         "gameOver":"The game is over.<br />Wait for the next game",
         "totalcount":"Total votes",
         "lastSelectedItem":"ITEM",
@@ -456,6 +498,9 @@ function getTpvsLang(/**/){
             if(settings.language == "ko"){
                 return tpvsLang.ko[key];
             }
+            else if(settings.language == "ja"){
+                return tpvsLang.ja[key];
+            }
             else {
                 return tpvsLang.en[key];
             }
@@ -464,6 +509,9 @@ function getTpvsLang(/**/){
             var formatargs = Array.from(arguments).slice(1, arguments.length);
             if(settings.language == "ko"){
                 return tpvsLang.ko[key].aryFormat(formatargs);
+            }
+            if(settings.language == "ja"){
+                return tpvsLang.ja[key].aryFormat(formatargs);
             }
             else {
                 return tpvsLang.en[key].aryFormat(formatargs);
@@ -569,6 +617,14 @@ function injectScript(script_ori){
         NOMO_DEBUG("error from injectScript", e);
     }
 }
+
+// var rawFileMainVendorBundle = new XMLHttpRequest();
+// rawFileMainVendorBundle.open("GET", "vendors.bundle.js", true);
+// rawFileMainVendorBundle.onload  = function() {
+//     var rawFileMainVendorBundleText = rawFileMainVendorBundle.responseText;
+//     eval(rawFileMainVendorBundleText);
+// }
+// rawFileMainVendorBundle.send(null);
 
 var rawFileMain = new XMLHttpRequest();
 rawFileMain.open("GET", "main.bundle.js", true);
@@ -824,6 +880,10 @@ const tpvs_style = /*css*/`
     padding: 0;
     box-sizing: border-box;
     word-break: keep-all;
+}
+
+body.ja #tpvs_desc, body.ja #twitchChatStatus{
+    word-break: break-all;
 }
 
 .wp {
@@ -1808,7 +1868,7 @@ function showLastSelectedWeapon(wptp, eventType){
             }
         }
 
-        if(settings.use_roulette){
+        if(settings.prevent_streamer_select && settings.use_roulette){
             selectedType = getTpvsLang("roulette");
         }
     }

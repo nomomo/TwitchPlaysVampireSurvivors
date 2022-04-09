@@ -1,29 +1,30 @@
 # Twitch Plays Vampire Survivors - Chat Poll Mod
 
+**Google translated**
+
 [![ko](https://img.shields.io/badge/lang-ko--kr-green.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.md)
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.en.md)
+[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.ja.md)
 
 Vampire Survivors's mod, TPVS, **adds a new feature to VS that allows viewers to vote for items via Twitch chat**.<br />
 
 After installing the mod, when you level up, voting proceeds as shown in the picture below<br />
 Viewers can select items via chat.
 
-![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/1_poll.png)
+![poll](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/1_poll_en.png)
 
 - In **STRICT Mode**, the player's keyboard & mouse operation is blocked on the level up scene.
 - After voting ends, items are automatically selected and reflected in the game.<br />
-![tsurun](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/2_tsr.png)
+![tsurun](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/2_tsr_en.png)
 
 ## Selectable options
 
 You can choose your play mode on the main page.
 
 - If you enable "Streamer Item Not Selectable Option", it becomes **Strict Mode**, and if disabled, it becomes **Soft Mode**.
-![Play Mode](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/mode.png)
+![Play Mode](https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/images/mode_en.png)
 
 ## How to install TPVS mod
-
-This mod will work in v3.3.0c version of Vampire Survivor as of March 6, 22 at 1 PM.
 
 1. Access the link below and download the latest version of the mod compressed file marked "Lastest".
 [https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases](https://github.com/nomomo/TwitchPlaysVampireSurvivors/releases)
@@ -47,6 +48,7 @@ The default installation path for VS is as follows.<br />
 
 ## Known Bugs
 
+- In some cases, a black screen may appear immediately after launching the game for the first time. Restarting the game usually solves the problem.
 - When returning to the main scene from the character select scene, sometimes the settings panel does not appear. In this case, click the "Options" button to show the settings panel again.
 
 ## How to remove TPVS mod

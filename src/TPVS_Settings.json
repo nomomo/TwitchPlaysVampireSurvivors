@@ -13,7 +13,7 @@
     "skip_poll_for_goldcoins_and_chicken" : true,
     "subonly" : false,
     
-    "panel_left" : false,
+    "panel_left" : true,
 
     "play_sound_effect" : true,
     "language" : "ko"

@@ -2,6 +2,7 @@
 
 [![ko](https://img.shields.io/badge/lang-ko--kr-green.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.md)
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.en.md)
+[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](https://github.com/nomomo/TwitchPlaysVampireSurvivors/blob/main/README.ja.md)
 
 혹시 노업 하이퍼 유령런, 사신런을 **정복**하셨나요?<br />
 그렇다면 매번 잘못된 훈수만 하는 트수들을 혼내줄 **트수런**에 도전해보세요!
