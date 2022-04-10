@@ -68,3 +68,7 @@ Alternatively, do an integrity check on Steam..
 - NOMO@핑크요정
 - nomotg@gmail.com
 - [nomo.asia](https://nomo.asia)
+
+## Happy??
+
+<a href="https://www.buymeacoffee.com/nomomo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="60"></a>　<a href="https://toon.at/donate/636947867320352181" target="_blank"><img src="https://raw.githubusercontent.com/nomomo/Addostream/master/assets/toonation_b11.gif" height="60" alt="Donate with Toonation" /></a>
