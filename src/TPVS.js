@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////
 // version
-var TPVS_Version = "v0.1.3";
+var TPVS_Version = "v0.1.4";
 function findNewVersion(){
     try{
         fetch("https://raw.githubusercontent.com/nomomo/TwitchPlaysVampireSurvivors/main/package.json")
@@ -527,13 +527,6 @@ function getTpvsLang(/**/){
 ////////////////////////////////////////////////////////////////////
 /// Load Game Script & injection
 ////////////////////////////////////////////////////////////////////
-var script = document.createElement('script');
-script.onload = function () {
-    NOMO_DEBUG("vendors.bundle.js loaded");
-};
-script.src = "vendors.bundle.js";
-document.head.appendChild(script);
-
 const injectionFromTo = [
     [
         [/(\]\('menu_start'\))/,"$1,tpvs_startPage()"]
@@ -618,37 +611,40 @@ function injectScript(script_ori){
     }
 }
 
-// var rawFileMainVendorBundle = new XMLHttpRequest();
-// rawFileMainVendorBundle.open("GET", "vendors.bundle.js", true);
-// rawFileMainVendorBundle.onload  = function() {
-//     var rawFileMainVendorBundleText = rawFileMainVendorBundle.responseText;
-//     eval(rawFileMainVendorBundleText);
-// }
-// rawFileMainVendorBundle.send(null);
+var rawFileMainVendorBundle = new XMLHttpRequest();
+rawFileMainVendorBundle.open("GET", "vendors.bundle.js", true);
+rawFileMainVendorBundle.onload  = function() {
+    var rawFileMainVendorBundleText = rawFileMainVendorBundle.responseText;
+    
+    var rawFileMain = new XMLHttpRequest();
+    rawFileMain.open("GET", "main.bundle.js", true);
+    rawFileMain.onload  = function() {
+        var rawFileMainText = rawFileMain.responseText;
+        // rawFileMainText = rawFileMainText
+        //     .replace("]('menu_start')","]('menu_start'),tpvs_startPage()")
+        //     .replace("]('postGame_header')","]('postGame_header'),tpvs_postGame()")
+        //     .replace("]('character_header')","]('character_header'),tpvs_startGame()")
+        //     .replace("]('options_header')","]('options_header'),tpvs_startPage()")
+        //     .replace("['BackFromCharSelectionScene'](){","['BackFromCharSelectionScene'](){tpvs_startPage();")
+        //     .replace("]('levelup_header')","]('levelup_header'),window.tpvs=this,tpvs_startPoll()");
+        // rawFileMainText = rawFileMainText.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':1.03,");
+        // rawFileMainText = rawFileMainText.replace("'price':0xc8,'power':0.05,","'price':0xc8,'power':100.05,");
+        // rawFileMainText = rawFileMainText.replace("'price':0xc8,'greed':0.1,","'price':0xc8,'greed':100.1,");
+        // rawFileMainText = rawFileMainText.replace("'price':0x12c,'moveSpeed':0.05,","'price':0x12c,'moveSpeed':10.1,");
+        // rawFileMainText = rawFileMainText.replace("const _0x1f2c2c=!0x1,_0x2f7f63=_0x1f2c2c,_0xd475d6=!0x1,_0x2c0488=0x143,_0x4d7454='v0.3.2c - EA'", "const _0x1f2c2c=!0x0,_0x2f7f63=_0x1f2c2c,_0xd475d6=!0x1,_0x2c0488=0x143,_0x4d7454='v0.3.2c - EA'");
+        rawFileMainText = injectScript(rawFileMainText);
 
-var rawFileMain = new XMLHttpRequest();
-rawFileMain.open("GET", "main.bundle.js", true);
-rawFileMain.onload  = function() {
-    var rawFileMainText = rawFileMain.responseText;
-    // rawFileMainText = rawFileMainText
-    //     .replace("]('menu_start')","]('menu_start'),tpvs_startPage()")
-    //     .replace("]('postGame_header')","]('postGame_header'),tpvs_postGame()")
-    //     .replace("]('character_header')","]('character_header'),tpvs_startGame()")
-    //     .replace("]('options_header')","]('options_header'),tpvs_startPage()")
-    //     .replace("['BackFromCharSelectionScene'](){","['BackFromCharSelectionScene'](){tpvs_startPage();")
-    //     .replace("]('levelup_header')","]('levelup_header'),window.tpvs=this,tpvs_startPoll()");
-    // rawFileMainText = rawFileMainText.replace("'price':0x384,'growth':0.03,","'price':0x384,'growth':1.03,");
-    // rawFileMainText = rawFileMainText.replace("'price':0xc8,'power':0.05,","'price':0xc8,'power':100.05,");
-    // rawFileMainText = rawFileMainText.replace("'price':0xc8,'greed':0.1,","'price':0xc8,'greed':100.1,");
-    // rawFileMainText = rawFileMainText.replace("'price':0x12c,'moveSpeed':0.05,","'price':0x12c,'moveSpeed':10.1,");
-    // rawFileMainText = rawFileMainText.replace("const _0x1f2c2c=!0x1,_0x2f7f63=_0x1f2c2c,_0xd475d6=!0x1,_0x2c0488=0x143,_0x4d7454='v0.3.2c - EA'", "const _0x1f2c2c=!0x0,_0x2f7f63=_0x1f2c2c,_0xd475d6=!0x1,_0x2c0488=0x143,_0x4d7454='v0.3.2c - EA'");
-    rawFileMainText = injectScript(rawFileMainText);
+        rawFileMainText = rawFileMainText.replace(/(\['BackFromStageSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();");
+        //NOMO_DEBUG(rawFileMainText);
+        rawFileMainText += rawFileMainVendorBundleText;
 
-    rawFileMainText = rawFileMainText.replace(/(\['BackFromStageSelectionScene'\]\(\)\{)/,"$1tpvs_startPage();");
-    //NOMO_DEBUG(rawFileMainText);
-    eval(rawFileMainText);
-};
-rawFileMain.send(null);
+        eval(rawFileMainText);
+    };
+    rawFileMain.send(null);
+    
+    //eval(rawFileMainVendorBundleText);
+}
+rawFileMainVendorBundle.send(null);
 
 
 
